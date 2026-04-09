@@ -1,0 +1,3497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Overview — GMASI / IceLynx Comparison</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 13px;
+      color: #1e2d3d;
+      background: #f4f7fb;
+    }
+
+    /* ── Page header ── */
+    #page-header {
+      background: #fff;
+      border-bottom: 1px solid #dde3ec;
+      padding: 16px 22px 12px;
+    }
+    #page-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0d2240;
+    }
+    .subtitle {
+      font-size: 11.5px;
+      color: #6b7e96;
+      margin-top: 3px;
+    }
+    .subtitle strong { color: #1e5fa8; font-weight: 600; }
+
+    /* ── Description ── */
+    .desc-card {
+      background: #fff;
+      border-left: 3px solid #1e5fa8;
+      border-radius: 0 5px 5px 0;
+      padding: 11px 16px;
+      margin: 14px 18px 0;
+      font-size: 12px;
+      color: #3a4f65;
+      line-height: 1.65;
+    }
+    .desc-card b { color: #0d2240; }
+
+    /* ── Controls ── */
+    #controls {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 10px 18px;
+      background: #fff;
+      border-bottom: 1px solid #dde3ec;
+      margin-top: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .ctrl-group {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .ctrl-sep {
+      width: 1px;
+      height: 28px;
+      background: #dde3ec;
+      margin: 0 4px;
+    }
+    .ctrl-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #4a5f77;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+    select.ctrl-select {
+      padding: 5px 10px;
+      border: 1px solid #c8d3e0;
+      border-radius: 5px;
+      background: #f8fafd;
+      font-size: 12.5px;
+      color: #1e2d3d;
+      cursor: pointer;
+      min-width: 160px;
+    }
+    select.ctrl-select:focus { outline: 2px solid #1e5fa8; outline-offset: 1px; }
+
+    /* ── Body columns ── */
+    #body-cols {
+      display: flex;
+      min-height: calc(100vh - 185px);
+    }
+
+    /* ── Table panel ── */
+    #table-panel {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 14px 18px 24px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      background: #fff;
+      border: 1px solid #dde3ec;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    thead th {
+      background: #0d2240;
+      color: #b8d0f0;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 9px 11px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid #edf1f7;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #ebf2ff; }
+    tbody tr.active { background: #cfe0ff; }
+    tbody tr.active td { color: #0d2240; }
+    td {
+      padding: 7px 11px;
+      vertical-align: middle;
+    }
+    td.sid {
+      font-family: 'Courier New', monospace;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #1e5fa8;
+      white-space: nowrap;
+    }
+    td.sname {
+      color: #1e2d3d;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .metric-cell {
+      position: relative;
+      min-width: 72px;
+    }
+    .mbar {
+      position: absolute;
+      left: 0; bottom: 0;
+      height: 3px;
+      border-radius: 0 2px 2px 0;
+      opacity: 0.65;
+      transition: width 0.3s;
+    }
+    .mval {
+      position: relative;
+      z-index: 1;
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+    }
+    .na { color: #aab4c0; font-style: italic; font-size: 11px; }
+
+    /* ── Map panel ── */
+    #map-panel {
+      flex: 0 0 300px;
+      border-left: 1px solid #dde3ec;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+    #map-header {
+      padding: 10px 14px 9px;
+      border-bottom: 1px solid #edf1f7;
+      background: #f8fafd;
+    }
+    .map-label-top {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #6b7e96;
+    }
+    .map-sector-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #1e5fa8;
+      margin-top: 2px;
+      min-height: 17px;
+    }
+    #map-img-wrap {
+      flex: 1;
+      background: #0d2240;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+    #map-img {
+      width: 100%;
+      max-width: 280px;
+      border-radius: 3px;
+      display: none;
+      transition: opacity 0.2s;
+    }
+    #map-placeholder {
+      text-align: center;
+      color: #4a6a8a;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    #map-placeholder .ico { font-size: 28px; display: block; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+
+<div id="page-header">
+  <h2>Overview &mdash; GMASI / IceLynx Resampling Comparison</h2>
+  <div class="subtitle" id="date-subtitle"></div>
+</div>
+
+<div class="desc-card">
+  Average classification metrics between <b>GMASI</b> and <b>IceLynx</b> per sea sector,
+  aggregated across all processed days. Select a <b>direction</b> and <b>resampling method</b>
+  to update the table. Click a row to highlight that sector on the polar map.
+</div>
+
+<div id="controls">
+  <div class="ctrl-group">
+    <span class="ctrl-label">Direction</span>
+    <select id="dir-select" class="ctrl-select"></select>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Method</span>
+    <select id="method-select" class="ctrl-select"></select>
+  </div>
+</div>
+
+<div id="body-cols">
+  <div id="table-panel">
+    <table id="metrics-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Sea Sector</th>
+          <th>F1 Score</th>
+          <th>Precision</th>
+          <th>Sensitivity</th>
+          <th>Specificity</th>
+          <th>Accuracy</th>
+          <th>Bal. Accuracy</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div id="map-panel">
+    <div id="map-header">
+      <div class="map-label-top">Sea Sector Map</div>
+      <div class="map-sector-name" id="map-sector-label">Select a row</div>
+    </div>
+    <div id="map-img-wrap">
+      <div id="map-placeholder">
+        <span class="ico">&#127758;</span>
+        Click a row to view<br>the sector on the polar map.
+      </div>
+      <img id="map-img" src="" alt="Sea sector polar map">
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  "directions": [
+    "upsample"
+  ],
+  "directionLabels": {
+    "upsample": "Upsample (GMASI \u2192 IceLynx resolution)",
+    "downsample": "Downsample (IceLynx \u2192 GMASI resolution)",
+    "regrid": "Regrid GMASI \u2192 IceLynx 1\u202fkm grid"
+  },
+  "directionResamplerGroups": {
+    "upsample": {
+      "Average": [
+        "Resampling.average_0.1",
+        "Resampling.average_0.2",
+        "Resampling.average_0.3",
+        "Resampling.average_0.5",
+        "Resampling.average_0.7"
+      ],
+      "Bilinear": [
+        "Resampling.bilinear_0.1",
+        "Resampling.bilinear_0.2",
+        "Resampling.bilinear_0.3",
+        "Resampling.bilinear_0.5",
+        "Resampling.bilinear_0.7"
+      ],
+      "Cubic": [
+        "Resampling.cubic_0.1",
+        "Resampling.cubic_0.2",
+        "Resampling.cubic_0.3",
+        "Resampling.cubic_0.5",
+        "Resampling.cubic_0.7"
+      ],
+      "Other": [
+        "gmasi_to_icelynx_Resampling.mode",
+        "gmasi_to_icelynx_Resampling.nearest"
+      ]
+    }
+  },
+  "resamplerLabels": {
+    "Resampling.average_0.1": "Average \u00b7 \u03b8=0.1",
+    "Resampling.average_0.2": "Average \u00b7 \u03b8=0.2",
+    "Resampling.average_0.3": "Average \u00b7 \u03b8=0.3",
+    "Resampling.average_0.5": "Average \u00b7 \u03b8=0.5",
+    "Resampling.average_0.7": "Average \u00b7 \u03b8=0.7",
+    "Resampling.bilinear_0.1": "Bilinear \u00b7 \u03b8=0.1",
+    "Resampling.bilinear_0.2": "Bilinear \u00b7 \u03b8=0.2",
+    "Resampling.bilinear_0.3": "Bilinear \u00b7 \u03b8=0.3",
+    "Resampling.bilinear_0.5": "Bilinear \u00b7 \u03b8=0.5",
+    "Resampling.bilinear_0.7": "Bilinear \u00b7 \u03b8=0.7",
+    "Resampling.cubic_0.1": "Cubic \u00b7 \u03b8=0.1",
+    "Resampling.cubic_0.2": "Cubic \u00b7 \u03b8=0.2",
+    "Resampling.cubic_0.3": "Cubic \u00b7 \u03b8=0.3",
+    "Resampling.cubic_0.5": "Cubic \u00b7 \u03b8=0.5",
+    "Resampling.cubic_0.7": "Cubic \u00b7 \u03b8=0.7",
+    "gmasi_to_icelynx_Resampling.nearest": "Nearest",
+    "gmasi_to_icelynx_Resampling.mode": "Mode"
+  },
+  "sectors": [
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "14A",
+    "15",
+    "15A",
+    "16",
+    "16A",
+    "17",
+    "17A",
+    "23",
+    "54",
+    "55",
+    "58",
+    "59"
+  ],
+  "sectorNames": {
+    "5": "Greenland Sea",
+    "7": "Barentsz Sea",
+    "9": "Kara Sea",
+    "10": "Laptev Sea",
+    "11": "East Siberian Sea",
+    "12": "Chukchi Sea",
+    "13": "Beaufort Sea",
+    "14": "The Northwestern Passages",
+    "14A": "Baffin Bay",
+    "15": "Davis Strait",
+    "15A": "Labrador Sea",
+    "17": "Arctic Ocean",
+    "17A": "Lincoln Sea",
+    "23": "North Atlantic Ocean",
+    "55": "Bering Sea",
+    "16A": "Hudson Strait",
+    "8": "White Sea",
+    "16": "Hudson Bay",
+    "54": "Sea of Okhotsk",
+    "6": "Norwegian Sea",
+    "58": "Gulf of Alaska",
+    "59": "The Coastal Waters of Southeast Alaska and British Columbia"
+  },
+  "metrics": {
+    "upsample": {
+      "Resampling.average_0.1": {
+        "5": {
+          "Accuracy": 0.9111,
+          "Precision": 0.9012,
+          "Sensitivity": 0.9606,
+          "Specificity": 0.8218,
+          "F1 Score": 0.929,
+          "Balanced Accuracy": 0.8912
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0108,
+          "Sensitivity": 0.1,
+          "Specificity": 1.0,
+          "F1 Score": 0.1316,
+          "Balanced Accuracy": 0.55
+        },
+        "7": {
+          "Accuracy": 0.9566,
+          "Precision": 0.3658,
+          "Sensitivity": 0.6177,
+          "Specificity": 0.962,
+          "F1 Score": 0.4453,
+          "Balanced Accuracy": 0.7898
+        },
+        "8": {
+          "Accuracy": 0.9646,
+          "Specificity": 0.9669,
+          "Precision": 0.0036,
+          "Sensitivity": 0.0717,
+          "Balanced Accuracy": 0.5185,
+          "F1 Score": 0.0185
+        },
+        "9": {
+          "Accuracy": 0.6773,
+          "Precision": 0.7526,
+          "Sensitivity": 0.8043,
+          "Specificity": 0.1827,
+          "F1 Score": 0.77,
+          "Balanced Accuracy": 0.4935
+        },
+        "10": {
+          "Accuracy": 0.5414,
+          "Precision": 0.9989,
+          "Sensitivity": 0.541,
+          "Specificity": 0.6302,
+          "F1 Score": 0.6623,
+          "Balanced Accuracy": 0.589
+        },
+        "11": {
+          "Accuracy": 0.6506,
+          "Precision": 0.9995,
+          "Sensitivity": 0.6506,
+          "Specificity": 0.4857,
+          "F1 Score": 0.7628,
+          "Balanced Accuracy": 0.5667
+        },
+        "12": {
+          "Accuracy": 0.6088,
+          "Precision": 0.7437,
+          "Sensitivity": 0.6596,
+          "Specificity": 0.3803,
+          "F1 Score": 0.6681,
+          "Balanced Accuracy": 0.52
+        },
+        "13": {
+          "Accuracy": 0.6898,
+          "Precision": 0.9597,
+          "Sensitivity": 0.7164,
+          "Specificity": 0.2141,
+          "F1 Score": 0.7909,
+          "Balanced Accuracy": 0.4805
+        },
+        "14": {
+          "Accuracy": 0.7825,
+          "Precision": 0.9039,
+          "Sensitivity": 0.8353,
+          "Specificity": 0.5167,
+          "F1 Score": 0.8617,
+          "Balanced Accuracy": 0.676
+        },
+        "14A": {
+          "Accuracy": 0.7056,
+          "Precision": 0.6949,
+          "Sensitivity": 0.9722,
+          "Specificity": 0.1106,
+          "F1 Score": 0.8042,
+          "Balanced Accuracy": 0.5414
+        },
+        "15": {
+          "Accuracy": 0.9766,
+          "Precision": 0.4008,
+          "Sensitivity": 0.5077,
+          "Specificity": 0.9792,
+          "F1 Score": 0.3962,
+          "Balanced Accuracy": 0.7434
+        },
+        "15A": {
+          "Accuracy": 0.999,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8873,
+          "Precision": 0.2229,
+          "Sensitivity": 0.4555,
+          "Specificity": 0.8829,
+          "F1 Score": 0.2867,
+          "Balanced Accuracy": 0.6692
+        },
+        "16A": {
+          "Accuracy": 0.9528,
+          "Precision": 0.0288,
+          "Sensitivity": 0.0815,
+          "Specificity": 0.9602,
+          "Balanced Accuracy": 0.5208,
+          "F1 Score": 0.0402
+        },
+        "17": {
+          "Accuracy": 0.6146,
+          "Precision": 0.9842,
+          "Sensitivity": 0.6168,
+          "Specificity": 0.4479,
+          "F1 Score": 0.7513,
+          "Balanced Accuracy": 0.5324
+        },
+        "17A": {
+          "Accuracy": 0.9571,
+          "Precision": 1.0,
+          "Sensitivity": 0.9571,
+          "F1 Score": 0.978
+        },
+        "23": {
+          "Accuracy": 0.9988,
+          "Precision": 0.3872,
+          "Sensitivity": 0.6263,
+          "Specificity": 0.9992,
+          "F1 Score": 0.4326,
+          "Balanced Accuracy": 0.8127
+        },
+        "54": {
+          "Accuracy": 0.981,
+          "Precision": 0.2698,
+          "Sensitivity": 0.279,
+          "Specificity": 0.9919,
+          "F1 Score": 0.2578,
+          "Balanced Accuracy": 0.6355
+        },
+        "55": {
+          "Accuracy": 0.9715,
+          "Precision": 0.4556,
+          "Sensitivity": 0.5255,
+          "Specificity": 0.9853,
+          "F1 Score": 0.4573,
+          "Balanced Accuracy": 0.7554
+        },
+        "58": {
+          "Accuracy": 0.9965,
+          "Precision": 0.0325,
+          "Sensitivity": 0.2944,
+          "Specificity": 0.9967,
+          "Balanced Accuracy": 0.6456,
+          "F1 Score": 0.1175
+        },
+        "59": {
+          "Accuracy": 0.9983,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9988,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.average_0.2": {
+        "5": {
+          "Accuracy": 0.9102,
+          "Precision": 0.8997,
+          "Sensitivity": 0.9607,
+          "Specificity": 0.8197,
+          "F1 Score": 0.9283,
+          "Balanced Accuracy": 0.8902
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0087,
+          "Sensitivity": 0.0889,
+          "Specificity": 1.0,
+          "F1 Score": 0.1067,
+          "Balanced Accuracy": 0.5444
+        },
+        "7": {
+          "Accuracy": 0.9562,
+          "Precision": 0.3581,
+          "Sensitivity": 0.6186,
+          "Specificity": 0.9614,
+          "F1 Score": 0.4395,
+          "Balanced Accuracy": 0.79
+        },
+        "8": {
+          "Accuracy": 0.9648,
+          "Specificity": 0.9669,
+          "Precision": 0.0035,
+          "Sensitivity": 0.0724,
+          "Balanced Accuracy": 0.5188,
+          "F1 Score": 0.0179
+        },
+        "9": {
+          "Accuracy": 0.6735,
+          "Precision": 0.747,
+          "Sensitivity": 0.8036,
+          "Specificity": 0.1809,
+          "F1 Score": 0.7665,
+          "Balanced Accuracy": 0.4923
+        },
+        "10": {
+          "Accuracy": 0.5414,
+          "Precision": 0.9987,
+          "Sensitivity": 0.541,
+          "Specificity": 0.6221,
+          "F1 Score": 0.6623,
+          "Balanced Accuracy": 0.5849
+        },
+        "11": {
+          "Accuracy": 0.6506,
+          "Precision": 0.9994,
+          "Sensitivity": 0.6506,
+          "Specificity": 0.486,
+          "F1 Score": 0.7628,
+          "Balanced Accuracy": 0.5669
+        },
+        "12": {
+          "Accuracy": 0.6074,
+          "Precision": 0.7403,
+          "Sensitivity": 0.6592,
+          "Specificity": 0.3792,
+          "F1 Score": 0.6663,
+          "Balanced Accuracy": 0.5192
+        },
+        "13": {
+          "Accuracy": 0.6893,
+          "Precision": 0.959,
+          "Sensitivity": 0.7164,
+          "Specificity": 0.2146,
+          "F1 Score": 0.7906,
+          "Balanced Accuracy": 0.4807
+        },
+        "14": {
+          "Accuracy": 0.7816,
+          "Precision": 0.9023,
+          "Sensitivity": 0.8354,
+          "Specificity": 0.5142,
+          "F1 Score": 0.861,
+          "Balanced Accuracy": 0.6748
+        },
+        "14A": {
+          "Accuracy": 0.7024,
+          "Precision": 0.6913,
+          "Sensitivity": 0.9722,
+          "Specificity": 0.1099,
+          "F1 Score": 0.8016,
+          "Balanced Accuracy": 0.541
+        },
+        "15": {
+          "Accuracy": 0.9766,
+          "Precision": 0.3967,
+          "Sensitivity": 0.511,
+          "Specificity": 0.979,
+          "F1 Score": 0.3958,
+          "Balanced Accuracy": 0.745
+        },
+        "15A": {
+          "Accuracy": 0.999,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8869,
+          "Precision": 0.2177,
+          "Sensitivity": 0.4547,
+          "Specificity": 0.8822,
+          "F1 Score": 0.2819,
+          "Balanced Accuracy": 0.6684
+        },
+        "16A": {
+          "Accuracy": 0.9532,
+          "Precision": 0.0257,
+          "Sensitivity": 0.0795,
+          "Specificity": 0.9601,
+          "Balanced Accuracy": 0.5198,
+          "F1 Score": 0.0373
+        },
+        "17": {
+          "Accuracy": 0.6143,
+          "Precision": 0.9836,
+          "Sensitivity": 0.6167,
+          "Specificity": 0.4412,
+          "F1 Score": 0.7511,
+          "Balanced Accuracy": 0.529
+        },
+        "17A": {
+          "Accuracy": 0.9571,
+          "Precision": 1.0,
+          "Sensitivity": 0.9571,
+          "F1 Score": 0.978
+        },
+        "23": {
+          "Accuracy": 0.9988,
+          "Precision": 0.3836,
+          "Sensitivity": 0.6275,
+          "Specificity": 0.9992,
+          "F1 Score": 0.4304,
+          "Balanced Accuracy": 0.8133
+        },
+        "54": {
+          "Accuracy": 0.9811,
+          "Precision": 0.2667,
+          "Sensitivity": 0.2801,
+          "Specificity": 0.9919,
+          "F1 Score": 0.2569,
+          "Balanced Accuracy": 0.636
+        },
+        "55": {
+          "Accuracy": 0.9715,
+          "Precision": 0.4495,
+          "Sensitivity": 0.5262,
+          "Specificity": 0.9851,
+          "F1 Score": 0.4537,
+          "Balanced Accuracy": 0.7557
+        },
+        "58": {
+          "Accuracy": 0.9965,
+          "Precision": 0.0301,
+          "Sensitivity": 0.2909,
+          "Specificity": 0.9967,
+          "Balanced Accuracy": 0.6438,
+          "F1 Score": 0.1097
+        },
+        "59": {
+          "Accuracy": 0.9983,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9988,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.average_0.3": {
+        "5": {
+          "Accuracy": 0.9094,
+          "Precision": 0.8983,
+          "Sensitivity": 0.9607,
+          "Specificity": 0.8177,
+          "F1 Score": 0.9276,
+          "Balanced Accuracy": 0.8892
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0065,
+          "Sensitivity": 0.075,
+          "Specificity": 1.0,
+          "F1 Score": 0.0811,
+          "Balanced Accuracy": 0.5375
+        },
+        "7": {
+          "Accuracy": 0.9558,
+          "Precision": 0.3498,
+          "Sensitivity": 0.6213,
+          "Specificity": 0.9608,
+          "F1 Score": 0.4335,
+          "Balanced Accuracy": 0.791
+        },
+        "8": {
+          "Accuracy": 0.9649,
+          "Specificity": 0.9669,
+          "Precision": 0.0031,
+          "Sensitivity": 0.0683,
+          "Balanced Accuracy": 0.5168,
+          "F1 Score": 0.0158
+        },
+        "9": {
+          "Accuracy": 0.6698,
+          "Precision": 0.7414,
+          "Sensitivity": 0.8029,
+          "Specificity": 0.1792,
+          "F1 Score": 0.763,
+          "Balanced Accuracy": 0.4911
+        },
+        "10": {
+          "Accuracy": 0.5414,
+          "Precision": 0.9986,
+          "Sensitivity": 0.541,
+          "Specificity": 0.6201,
+          "F1 Score": 0.6623,
+          "Balanced Accuracy": 0.5806
+        },
+        "11": {
+          "Accuracy": 0.6506,
+          "Precision": 0.9994,
+          "Sensitivity": 0.6507,
+          "Specificity": 0.4854,
+          "F1 Score": 0.7628,
+          "Balanced Accuracy": 0.5666
+        },
+        "12": {
+          "Accuracy": 0.606,
+          "Precision": 0.7368,
+          "Sensitivity": 0.6588,
+          "Specificity": 0.3786,
+          "F1 Score": 0.6643,
+          "Balanced Accuracy": 0.5187
+        },
+        "13": {
+          "Accuracy": 0.6889,
+          "Precision": 0.9583,
+          "Sensitivity": 0.7164,
+          "Specificity": 0.2145,
+          "F1 Score": 0.7902,
+          "Balanced Accuracy": 0.4807
+        },
+        "14": {
+          "Accuracy": 0.7808,
+          "Precision": 0.9008,
+          "Sensitivity": 0.8355,
+          "Specificity": 0.5118,
+          "F1 Score": 0.8603,
+          "Balanced Accuracy": 0.6737
+        },
+        "14A": {
+          "Accuracy": 0.6993,
+          "Precision": 0.6877,
+          "Sensitivity": 0.9723,
+          "Specificity": 0.1093,
+          "F1 Score": 0.7989,
+          "Balanced Accuracy": 0.5408
+        },
+        "15": {
+          "Accuracy": 0.9765,
+          "Precision": 0.3922,
+          "Sensitivity": 0.5137,
+          "Specificity": 0.9788,
+          "F1 Score": 0.395,
+          "Balanced Accuracy": 0.7463
+        },
+        "15A": {
+          "Accuracy": 0.9991,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8863,
+          "Precision": 0.2122,
+          "Sensitivity": 0.4537,
+          "Specificity": 0.8815,
+          "F1 Score": 0.2767,
+          "Balanced Accuracy": 0.6676
+        },
+        "16A": {
+          "Accuracy": 0.9535,
+          "Precision": 0.0246,
+          "Sensitivity": 0.078,
+          "Specificity": 0.9601,
+          "Balanced Accuracy": 0.519,
+          "F1 Score": 0.0354
+        },
+        "17": {
+          "Accuracy": 0.614,
+          "Precision": 0.9829,
+          "Sensitivity": 0.6166,
+          "Specificity": 0.4337,
+          "F1 Score": 0.7508,
+          "Balanced Accuracy": 0.5252
+        },
+        "17A": {
+          "Accuracy": 0.9571,
+          "Precision": 1.0,
+          "Sensitivity": 0.9571,
+          "F1 Score": 0.978
+        },
+        "23": {
+          "Accuracy": 0.9988,
+          "Precision": 0.3798,
+          "Sensitivity": 0.6291,
+          "Specificity": 0.9992,
+          "F1 Score": 0.4282,
+          "Balanced Accuracy": 0.8141
+        },
+        "54": {
+          "Accuracy": 0.9812,
+          "Precision": 0.2636,
+          "Sensitivity": 0.2811,
+          "Specificity": 0.9918,
+          "F1 Score": 0.2559,
+          "Balanced Accuracy": 0.6365
+        },
+        "55": {
+          "Accuracy": 0.9715,
+          "Precision": 0.4439,
+          "Sensitivity": 0.5269,
+          "Specificity": 0.985,
+          "F1 Score": 0.4502,
+          "Balanced Accuracy": 0.7559
+        },
+        "58": {
+          "Accuracy": 0.9965,
+          "Precision": 0.0278,
+          "Sensitivity": 0.2918,
+          "Specificity": 0.9967,
+          "Balanced Accuracy": 0.6442,
+          "F1 Score": 0.1018
+        },
+        "59": {
+          "Accuracy": 0.9984,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9988,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.average_0.5": {
+        "5": {
+          "Accuracy": 0.9077,
+          "Precision": 0.8954,
+          "Sensitivity": 0.9609,
+          "Specificity": 0.8137,
+          "F1 Score": 0.9261,
+          "Balanced Accuracy": 0.8873
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0043,
+          "Sensitivity": 0.0571,
+          "Specificity": 1.0,
+          "F1 Score": 0.0548,
+          "Balanced Accuracy": 0.5286
+        },
+        "7": {
+          "Accuracy": 0.9551,
+          "Precision": 0.3343,
+          "Sensitivity": 0.6257,
+          "Specificity": 0.9597,
+          "F1 Score": 0.4217,
+          "Balanced Accuracy": 0.7927
+        },
+        "8": {
+          "Accuracy": 0.9652,
+          "Specificity": 0.9669,
+          "Precision": 0.0027,
+          "Sensitivity": 0.0669,
+          "Balanced Accuracy": 0.5161,
+          "F1 Score": 0.014
+        },
+        "9": {
+          "Accuracy": 0.6622,
+          "Precision": 0.7301,
+          "Sensitivity": 0.8015,
+          "Specificity": 0.1761,
+          "F1 Score": 0.7558,
+          "Balanced Accuracy": 0.4888
+        },
+        "10": {
+          "Accuracy": 0.5415,
+          "Precision": 0.9983,
+          "Sensitivity": 0.5411,
+          "Specificity": 0.6031,
+          "F1 Score": 0.6622,
+          "Balanced Accuracy": 0.5721
+        },
+        "11": {
+          "Accuracy": 0.6506,
+          "Precision": 0.9994,
+          "Sensitivity": 0.6507,
+          "Specificity": 0.4847,
+          "F1 Score": 0.7628,
+          "Balanced Accuracy": 0.5663
+        },
+        "12": {
+          "Accuracy": 0.6033,
+          "Precision": 0.7302,
+          "Sensitivity": 0.658,
+          "Specificity": 0.3773,
+          "F1 Score": 0.6606,
+          "Balanced Accuracy": 0.5177
+        },
+        "13": {
+          "Accuracy": 0.6879,
+          "Precision": 0.9568,
+          "Sensitivity": 0.7164,
+          "Specificity": 0.2141,
+          "F1 Score": 0.7895,
+          "Balanced Accuracy": 0.4805
+        },
+        "14": {
+          "Accuracy": 0.7789,
+          "Precision": 0.8976,
+          "Sensitivity": 0.8358,
+          "Specificity": 0.5067,
+          "F1 Score": 0.8588,
+          "Balanced Accuracy": 0.6712
+        },
+        "14A": {
+          "Accuracy": 0.6928,
+          "Precision": 0.6805,
+          "Sensitivity": 0.9723,
+          "Specificity": 0.1079,
+          "F1 Score": 0.7935,
+          "Balanced Accuracy": 0.5401
+        },
+        "15": {
+          "Accuracy": 0.9764,
+          "Precision": 0.3826,
+          "Sensitivity": 0.5182,
+          "Specificity": 0.9785,
+          "F1 Score": 0.3925,
+          "Balanced Accuracy": 0.7483
+        },
+        "15A": {
+          "Accuracy": 0.9992,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8855,
+          "Precision": 0.2033,
+          "Sensitivity": 0.4542,
+          "Specificity": 0.8802,
+          "F1 Score": 0.2684,
+          "Balanced Accuracy": 0.6672
+        },
+        "16A": {
+          "Accuracy": 0.9541,
+          "Precision": 0.0196,
+          "Sensitivity": 0.0759,
+          "Specificity": 0.96,
+          "Balanced Accuracy": 0.518,
+          "F1 Score": 0.032
+        },
+        "17": {
+          "Accuracy": 0.6133,
+          "Precision": 0.9816,
+          "Sensitivity": 0.6164,
+          "Specificity": 0.4202,
+          "F1 Score": 0.7503,
+          "Balanced Accuracy": 0.5183
+        },
+        "17A": {
+          "Accuracy": 0.9571,
+          "Precision": 1.0,
+          "Sensitivity": 0.9571,
+          "F1 Score": 0.978
+        },
+        "23": {
+          "Accuracy": 0.9988,
+          "Precision": 0.3721,
+          "Sensitivity": 0.6311,
+          "Specificity": 0.9992,
+          "F1 Score": 0.4233,
+          "Balanced Accuracy": 0.8152
+        },
+        "54": {
+          "Accuracy": 0.9814,
+          "Precision": 0.2574,
+          "Sensitivity": 0.2832,
+          "Specificity": 0.9917,
+          "F1 Score": 0.2539,
+          "Balanced Accuracy": 0.6374
+        },
+        "55": {
+          "Accuracy": 0.9715,
+          "Precision": 0.4333,
+          "Sensitivity": 0.5284,
+          "Specificity": 0.9847,
+          "F1 Score": 0.4436,
+          "Balanced Accuracy": 0.7565
+        },
+        "58": {
+          "Accuracy": 0.9965,
+          "Precision": 0.0233,
+          "Sensitivity": 0.288,
+          "Specificity": 0.9967,
+          "Balanced Accuracy": 0.6424,
+          "F1 Score": 0.1079
+        },
+        "59": {
+          "Accuracy": 0.9985,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9988,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.average_0.7": {
+        "5": {
+          "Accuracy": 0.9059,
+          "Precision": 0.8926,
+          "Sensitivity": 0.961,
+          "Specificity": 0.8096,
+          "F1 Score": 0.9246,
+          "Balanced Accuracy": 0.8853
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0043,
+          "Sensitivity": 0.0571,
+          "Specificity": 1.0,
+          "F1 Score": 0.0548,
+          "Balanced Accuracy": 0.5286
+        },
+        "7": {
+          "Accuracy": 0.9544,
+          "Precision": 0.3187,
+          "Sensitivity": 0.6307,
+          "Specificity": 0.9585,
+          "F1 Score": 0.4093,
+          "Balanced Accuracy": 0.7946
+        },
+        "8": {
+          "Accuracy": 0.9654,
+          "Specificity": 0.9668,
+          "Precision": 0.0021,
+          "Sensitivity": 0.0584,
+          "Balanced Accuracy": 0.5118,
+          "F1 Score": 0.0107
+        },
+        "9": {
+          "Accuracy": 0.6545,
+          "Precision": 0.7188,
+          "Sensitivity": 0.7999,
+          "Specificity": 0.1731,
+          "F1 Score": 0.7484,
+          "Balanced Accuracy": 0.4865
+        },
+        "10": {
+          "Accuracy": 0.5415,
+          "Precision": 0.998,
+          "Sensitivity": 0.5411,
+          "Specificity": 0.59,
+          "F1 Score": 0.6621,
+          "Balanced Accuracy": 0.5655
+        },
+        "11": {
+          "Accuracy": 0.6506,
+          "Precision": 0.9993,
+          "Sensitivity": 0.6507,
+          "Specificity": 0.4842,
+          "F1 Score": 0.7628,
+          "Balanced Accuracy": 0.566
+        },
+        "12": {
+          "Accuracy": 0.6005,
+          "Precision": 0.7236,
+          "Sensitivity": 0.6572,
+          "Specificity": 0.376,
+          "F1 Score": 0.6568,
+          "Balanced Accuracy": 0.5166
+        },
+        "13": {
+          "Accuracy": 0.687,
+          "Precision": 0.9554,
+          "Sensitivity": 0.7163,
+          "Specificity": 0.2143,
+          "F1 Score": 0.7887,
+          "Balanced Accuracy": 0.4805
+        },
+        "14": {
+          "Accuracy": 0.777,
+          "Precision": 0.8943,
+          "Sensitivity": 0.836,
+          "Specificity": 0.5017,
+          "F1 Score": 0.8573,
+          "Balanced Accuracy": 0.6689
+        },
+        "14A": {
+          "Accuracy": 0.6863,
+          "Precision": 0.6731,
+          "Sensitivity": 0.9724,
+          "Specificity": 0.1067,
+          "F1 Score": 0.788,
+          "Balanced Accuracy": 0.5395
+        },
+        "15": {
+          "Accuracy": 0.9762,
+          "Precision": 0.3741,
+          "Sensitivity": 0.5242,
+          "Specificity": 0.9781,
+          "F1 Score": 0.3911,
+          "Balanced Accuracy": 0.7511
+        },
+        "15A": {
+          "Accuracy": 0.9993,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8845,
+          "Precision": 0.1936,
+          "Sensitivity": 0.4529,
+          "Specificity": 0.8789,
+          "F1 Score": 0.2586,
+          "Balanced Accuracy": 0.6659
+        },
+        "16A": {
+          "Accuracy": 0.9548,
+          "Precision": 0.0176,
+          "Sensitivity": 0.075,
+          "Specificity": 0.96,
+          "Balanced Accuracy": 0.5175,
+          "F1 Score": 0.0294
+        },
+        "17": {
+          "Accuracy": 0.6126,
+          "Precision": 0.9804,
+          "Sensitivity": 0.6162,
+          "Specificity": 0.4079,
+          "F1 Score": 0.7497,
+          "Balanced Accuracy": 0.5121
+        },
+        "17A": {
+          "Accuracy": 0.9571,
+          "Precision": 1.0,
+          "Sensitivity": 0.9571,
+          "F1 Score": 0.978
+        },
+        "23": {
+          "Accuracy": 0.9988,
+          "Precision": 0.3642,
+          "Sensitivity": 0.6339,
+          "Specificity": 0.9992,
+          "F1 Score": 0.4184,
+          "Balanced Accuracy": 0.8166
+        },
+        "54": {
+          "Accuracy": 0.9817,
+          "Precision": 0.2515,
+          "Sensitivity": 0.2859,
+          "Specificity": 0.9916,
+          "F1 Score": 0.2523,
+          "Balanced Accuracy": 0.6388
+        },
+        "55": {
+          "Accuracy": 0.9716,
+          "Precision": 0.4231,
+          "Sensitivity": 0.5296,
+          "Specificity": 0.9844,
+          "F1 Score": 0.437,
+          "Balanced Accuracy": 0.757
+        },
+        "58": {
+          "Accuracy": 0.9965,
+          "Precision": 0.019,
+          "Sensitivity": 0.2846,
+          "Specificity": 0.9966,
+          "Balanced Accuracy": 0.6406,
+          "F1 Score": 0.0894
+        },
+        "59": {
+          "Accuracy": 0.9986,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9988,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.bilinear_0.1": {
+        "5": {
+          "Accuracy": 0.9169,
+          "Precision": 0.9081,
+          "Sensitivity": 0.963,
+          "Specificity": 0.8317,
+          "F1 Score": 0.9339,
+          "Balanced Accuracy": 0.8973
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0106,
+          "Sensitivity": 0.1,
+          "Specificity": 1.0,
+          "F1 Score": 0.129,
+          "Balanced Accuracy": 0.55
+        },
+        "7": {
+          "Accuracy": 0.9584,
+          "Precision": 0.3771,
+          "Sensitivity": 0.6288,
+          "Specificity": 0.9634,
+          "F1 Score": 0.4566,
+          "Balanced Accuracy": 0.7961
+        },
+        "8": {
+          "Accuracy": 0.9651,
+          "Specificity": 0.9677,
+          "Precision": 0.005,
+          "Sensitivity": 0.0816,
+          "Balanced Accuracy": 0.5239,
+          "F1 Score": 0.024
+        },
+        "9": {
+          "Accuracy": 0.6828,
+          "Precision": 0.7556,
+          "Sensitivity": 0.8102,
+          "Specificity": 0.1826,
+          "F1 Score": 0.7744,
+          "Balanced Accuracy": 0.4964
+        },
+        "10": {
+          "Accuracy": 0.5431,
+          "Precision": 0.9991,
+          "Sensitivity": 0.5428,
+          "Specificity": 0.6336,
+          "F1 Score": 0.6636,
+          "Balanced Accuracy": 0.5916
+        },
+        "11": {
+          "Accuracy": 0.6514,
+          "Precision": 0.9996,
+          "Sensitivity": 0.6514,
+          "Specificity": 0.5076,
+          "F1 Score": 0.7634,
+          "Balanced Accuracy": 0.5741
+        },
+        "12": {
+          "Accuracy": 0.6278,
+          "Precision": 0.7883,
+          "Sensitivity": 0.664,
+          "Specificity": 0.3731,
+          "F1 Score": 0.6925,
+          "Balanced Accuracy": 0.5127
+        },
+        "13": {
+          "Accuracy": 0.6923,
+          "Precision": 0.9626,
+          "Sensitivity": 0.7172,
+          "Specificity": 0.212,
+          "F1 Score": 0.7928,
+          "Balanced Accuracy": 0.4798
+        },
+        "14": {
+          "Accuracy": 0.7887,
+          "Precision": 0.9083,
+          "Sensitivity": 0.8393,
+          "Specificity": 0.5255,
+          "F1 Score": 0.8661,
+          "Balanced Accuracy": 0.6824
+        },
+        "14A": {
+          "Accuracy": 0.7122,
+          "Precision": 0.7016,
+          "Sensitivity": 0.9739,
+          "Specificity": 0.1088,
+          "F1 Score": 0.8093,
+          "Balanced Accuracy": 0.5413
+        },
+        "15": {
+          "Accuracy": 0.9776,
+          "Precision": 0.4094,
+          "Sensitivity": 0.509,
+          "Specificity": 0.98,
+          "F1 Score": 0.3978,
+          "Balanced Accuracy": 0.7445
+        },
+        "15A": {
+          "Accuracy": 0.9988,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8895,
+          "Precision": 0.2349,
+          "Sensitivity": 0.4583,
+          "Specificity": 0.8854,
+          "F1 Score": 0.2965,
+          "Balanced Accuracy": 0.6718
+        },
+        "16A": {
+          "Accuracy": 0.9537,
+          "Precision": 0.0312,
+          "Sensitivity": 0.0798,
+          "Specificity": 0.9614,
+          "Balanced Accuracy": 0.5206,
+          "F1 Score": 0.0397
+        },
+        "17": {
+          "Accuracy": 0.6152,
+          "Precision": 0.9856,
+          "Sensitivity": 0.617,
+          "Specificity": 0.4656,
+          "F1 Score": 0.7519,
+          "Balanced Accuracy": 0.5413
+        },
+        "17A": {
+          "Accuracy": 0.9626,
+          "Precision": 1.0,
+          "Sensitivity": 0.9626,
+          "F1 Score": 0.9809
+        },
+        "23": {
+          "Accuracy": 0.9988,
+          "Precision": 0.4061,
+          "Sensitivity": 0.628,
+          "Specificity": 0.9992,
+          "F1 Score": 0.442,
+          "Balanced Accuracy": 0.8136
+        },
+        "54": {
+          "Accuracy": 0.9806,
+          "Precision": 0.282,
+          "Sensitivity": 0.2692,
+          "Specificity": 0.9923,
+          "F1 Score": 0.2587,
+          "Balanced Accuracy": 0.6308
+        },
+        "55": {
+          "Accuracy": 0.9718,
+          "Precision": 0.5253,
+          "Sensitivity": 0.5277,
+          "Specificity": 0.9874,
+          "F1 Score": 0.4968,
+          "Balanced Accuracy": 0.7575
+        },
+        "58": {
+          "Accuracy": 0.9967,
+          "Precision": 0.0364,
+          "Sensitivity": 0.3026,
+          "Specificity": 0.9969,
+          "Balanced Accuracy": 0.6498,
+          "F1 Score": 0.1632
+        },
+        "59": {
+          "Accuracy": 0.9982,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9989,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.bilinear_0.2": {
+        "5": {
+          "Accuracy": 0.9145,
+          "Precision": 0.9041,
+          "Sensitivity": 0.9632,
+          "Specificity": 0.8258,
+          "F1 Score": 0.9319,
+          "Balanced Accuracy": 0.8945
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0106,
+          "Sensitivity": 0.1143,
+          "Specificity": 1.0,
+          "F1 Score": 0.1311,
+          "Balanced Accuracy": 0.5571
+        },
+        "7": {
+          "Accuracy": 0.9579,
+          "Precision": 0.3634,
+          "Sensitivity": 0.6363,
+          "Specificity": 0.9625,
+          "F1 Score": 0.4478,
+          "Balanced Accuracy": 0.7994
+        },
+        "8": {
+          "Accuracy": 0.9655,
+          "Specificity": 0.9677,
+          "Precision": 0.0042,
+          "Sensitivity": 0.0786,
+          "Balanced Accuracy": 0.5224,
+          "F1 Score": 0.0202
+        },
+        "9": {
+          "Accuracy": 0.6772,
+          "Precision": 0.7474,
+          "Sensitivity": 0.8092,
+          "Specificity": 0.18,
+          "F1 Score": 0.7693,
+          "Balanced Accuracy": 0.4946
+        },
+        "10": {
+          "Accuracy": 0.5431,
+          "Precision": 0.9989,
+          "Sensitivity": 0.5428,
+          "Specificity": 0.6142,
+          "F1 Score": 0.6635,
+          "Balanced Accuracy": 0.5819
+        },
+        "11": {
+          "Accuracy": 0.6514,
+          "Precision": 0.9996,
+          "Sensitivity": 0.6514,
+          "Specificity": 0.5034,
+          "F1 Score": 0.7634,
+          "Balanced Accuracy": 0.572
+        },
+        "12": {
+          "Accuracy": 0.6207,
+          "Precision": 0.7702,
+          "Sensitivity": 0.6627,
+          "Specificity": 0.3717,
+          "F1 Score": 0.6832,
+          "Balanced Accuracy": 0.5114
+        },
+        "13": {
+          "Accuracy": 0.6911,
+          "Precision": 0.9607,
+          "Sensitivity": 0.7172,
+          "Specificity": 0.213,
+          "F1 Score": 0.7918,
+          "Balanced Accuracy": 0.4804
+        },
+        "14": {
+          "Accuracy": 0.787,
+          "Precision": 0.9053,
+          "Sensitivity": 0.8396,
+          "Specificity": 0.5205,
+          "F1 Score": 0.8648,
+          "Balanced Accuracy": 0.68
+        },
+        "14A": {
+          "Accuracy": 0.7075,
+          "Precision": 0.6963,
+          "Sensitivity": 0.9739,
+          "Specificity": 0.1078,
+          "F1 Score": 0.8055,
+          "Balanced Accuracy": 0.5409
+        },
+        "15": {
+          "Accuracy": 0.9775,
+          "Precision": 0.4021,
+          "Sensitivity": 0.5148,
+          "Specificity": 0.9797,
+          "F1 Score": 0.3977,
+          "Balanced Accuracy": 0.7472
+        },
+        "15A": {
+          "Accuracy": 0.9989,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8887,
+          "Precision": 0.2254,
+          "Sensitivity": 0.4584,
+          "Specificity": 0.8842,
+          "F1 Score": 0.2883,
+          "Balanced Accuracy": 0.6713
+        },
+        "16A": {
+          "Accuracy": 0.9544,
+          "Precision": 0.027,
+          "Sensitivity": 0.078,
+          "Specificity": 0.9613,
+          "Balanced Accuracy": 0.5196,
+          "F1 Score": 0.0359
+        },
+        "17": {
+          "Accuracy": 0.6147,
+          "Precision": 0.9845,
+          "Sensitivity": 0.6168,
+          "Specificity": 0.4522,
+          "F1 Score": 0.7515,
+          "Balanced Accuracy": 0.5345
+        },
+        "17A": {
+          "Accuracy": 0.9626,
+          "Precision": 1.0,
+          "Sensitivity": 0.9626,
+          "F1 Score": 0.9809
+        },
+        "23": {
+          "Accuracy": 0.9988,
+          "Precision": 0.3948,
+          "Sensitivity": 0.6318,
+          "Specificity": 0.9992,
+          "F1 Score": 0.4356,
+          "Balanced Accuracy": 0.8155
+        },
+        "54": {
+          "Accuracy": 0.981,
+          "Precision": 0.2746,
+          "Sensitivity": 0.2738,
+          "Specificity": 0.9922,
+          "F1 Score": 0.2578,
+          "Balanced Accuracy": 0.633
+        },
+        "55": {
+          "Accuracy": 0.9723,
+          "Precision": 0.4856,
+          "Sensitivity": 0.5328,
+          "Specificity": 0.9865,
+          "F1 Score": 0.4767,
+          "Balanced Accuracy": 0.7596
+        },
+        "58": {
+          "Accuracy": 0.9967,
+          "Precision": 0.0319,
+          "Sensitivity": 0.3009,
+          "Specificity": 0.9969,
+          "Balanced Accuracy": 0.6489,
+          "F1 Score": 0.1447
+        },
+        "59": {
+          "Accuracy": 0.9984,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9989,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.bilinear_0.3": {
+        "5": {
+          "Accuracy": 0.9125,
+          "Precision": 0.9007,
+          "Sensitivity": 0.9634,
+          "Specificity": 0.821,
+          "F1 Score": 0.9301,
+          "Balanced Accuracy": 0.8922
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0053,
+          "Sensitivity": 0.08,
+          "Specificity": 1.0,
+          "F1 Score": 0.0678,
+          "Balanced Accuracy": 0.54
+        },
+        "7": {
+          "Accuracy": 0.9576,
+          "Precision": 0.3532,
+          "Sensitivity": 0.6443,
+          "Specificity": 0.9618,
+          "F1 Score": 0.4416,
+          "Balanced Accuracy": 0.803
+        },
+        "8": {
+          "Accuracy": 0.9658,
+          "Specificity": 0.9677,
+          "Precision": 0.0036,
+          "Sensitivity": 0.0787,
+          "Balanced Accuracy": 0.5224,
+          "F1 Score": 0.0177
+        },
+        "9": {
+          "Accuracy": 0.6729,
+          "Precision": 0.7411,
+          "Sensitivity": 0.8085,
+          "Specificity": 0.1782,
+          "F1 Score": 0.7653,
+          "Balanced Accuracy": 0.4933
+        },
+        "10": {
+          "Accuracy": 0.5431,
+          "Precision": 0.9987,
+          "Sensitivity": 0.5428,
+          "Specificity": 0.6067,
+          "F1 Score": 0.6635,
+          "Balanced Accuracy": 0.5782
+        },
+        "11": {
+          "Accuracy": 0.6514,
+          "Precision": 0.9995,
+          "Sensitivity": 0.6515,
+          "Specificity": 0.5025,
+          "F1 Score": 0.7634,
+          "Balanced Accuracy": 0.5716
+        },
+        "12": {
+          "Accuracy": 0.6153,
+          "Precision": 0.7563,
+          "Sensitivity": 0.6618,
+          "Specificity": 0.3729,
+          "F1 Score": 0.6758,
+          "Balanced Accuracy": 0.5115
+        },
+        "13": {
+          "Accuracy": 0.6902,
+          "Precision": 0.9593,
+          "Sensitivity": 0.7172,
+          "Specificity": 0.2132,
+          "F1 Score": 0.7912,
+          "Balanced Accuracy": 0.4805
+        },
+        "14": {
+          "Accuracy": 0.7856,
+          "Precision": 0.9028,
+          "Sensitivity": 0.8398,
+          "Specificity": 0.5164,
+          "F1 Score": 0.8636,
+          "Balanced Accuracy": 0.6781
+        },
+        "14A": {
+          "Accuracy": 0.703,
+          "Precision": 0.6912,
+          "Sensitivity": 0.974,
+          "Specificity": 0.1069,
+          "F1 Score": 0.8018,
+          "Balanced Accuracy": 0.5404
+        },
+        "15": {
+          "Accuracy": 0.9775,
+          "Precision": 0.3941,
+          "Sensitivity": 0.5199,
+          "Specificity": 0.9795,
+          "F1 Score": 0.3967,
+          "Balanced Accuracy": 0.7497
+        },
+        "15A": {
+          "Accuracy": 0.999,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.888,
+          "Precision": 0.217,
+          "Sensitivity": 0.4577,
+          "Specificity": 0.8831,
+          "F1 Score": 0.2807,
+          "Balanced Accuracy": 0.6704
+        },
+        "16A": {
+          "Accuracy": 0.955,
+          "Precision": 0.0249,
+          "Sensitivity": 0.0763,
+          "Specificity": 0.9612,
+          "Balanced Accuracy": 0.5188,
+          "F1 Score": 0.0329
+        },
+        "17": {
+          "Accuracy": 0.6143,
+          "Precision": 0.9837,
+          "Sensitivity": 0.6167,
+          "Specificity": 0.4421,
+          "F1 Score": 0.7511,
+          "Balanced Accuracy": 0.5294
+        },
+        "17A": {
+          "Accuracy": 0.9626,
+          "Precision": 1.0,
+          "Sensitivity": 0.9626,
+          "F1 Score": 0.9809
+        },
+        "23": {
+          "Accuracy": 0.9988,
+          "Precision": 0.3848,
+          "Sensitivity": 0.6354,
+          "Specificity": 0.9992,
+          "F1 Score": 0.4297,
+          "Balanced Accuracy": 0.8173
+        },
+        "54": {
+          "Accuracy": 0.9814,
+          "Precision": 0.2673,
+          "Sensitivity": 0.2778,
+          "Specificity": 0.9921,
+          "F1 Score": 0.2564,
+          "Balanced Accuracy": 0.635
+        },
+        "55": {
+          "Accuracy": 0.9724,
+          "Precision": 0.4574,
+          "Sensitivity": 0.5344,
+          "Specificity": 0.9858,
+          "F1 Score": 0.46,
+          "Balanced Accuracy": 0.7601
+        },
+        "58": {
+          "Accuracy": 0.9967,
+          "Precision": 0.0285,
+          "Sensitivity": 0.3045,
+          "Specificity": 0.9969,
+          "Balanced Accuracy": 0.6507,
+          "F1 Score": 0.1307
+        },
+        "59": {
+          "Accuracy": 0.9985,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9989,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.bilinear_0.5": {
+        "5": {
+          "Accuracy": 0.9093,
+          "Precision": 0.8953,
+          "Sensitivity": 0.9637,
+          "Specificity": 0.8135,
+          "F1 Score": 0.9274,
+          "Balanced Accuracy": 0.8886
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0053,
+          "Sensitivity": 0.08,
+          "Specificity": 1.0,
+          "F1 Score": 0.0678,
+          "Balanced Accuracy": 0.54
+        },
+        "7": {
+          "Accuracy": 0.9568,
+          "Precision": 0.3325,
+          "Sensitivity": 0.656,
+          "Specificity": 0.9603,
+          "F1 Score": 0.4265,
+          "Balanced Accuracy": 0.8082
+        },
+        "8": {
+          "Accuracy": 0.9663,
+          "Specificity": 0.9676,
+          "Precision": 0.0027,
+          "Sensitivity": 0.0758,
+          "Balanced Accuracy": 0.5209,
+          "F1 Score": 0.0132
+        },
+        "9": {
+          "Accuracy": 0.6649,
+          "Precision": 0.7294,
+          "Sensitivity": 0.8072,
+          "Specificity": 0.175,
+          "F1 Score": 0.7578,
+          "Balanced Accuracy": 0.4911
+        },
+        "10": {
+          "Accuracy": 0.5432,
+          "Precision": 0.9984,
+          "Sensitivity": 0.5429,
+          "Specificity": 0.5923,
+          "F1 Score": 0.6635,
+          "Balanced Accuracy": 0.5676
+        },
+        "11": {
+          "Accuracy": 0.6515,
+          "Precision": 0.9995,
+          "Sensitivity": 0.6515,
+          "Specificity": 0.4878,
+          "F1 Score": 0.7634,
+          "Balanced Accuracy": 0.5626
+        },
+        "12": {
+          "Accuracy": 0.6048,
+          "Precision": 0.731,
+          "Sensitivity": 0.6596,
+          "Specificity": 0.3657,
+          "F1 Score": 0.6616,
+          "Balanced Accuracy": 0.5096
+        },
+        "13": {
+          "Accuracy": 0.6887,
+          "Precision": 0.9569,
+          "Sensitivity": 0.7171,
+          "Specificity": 0.2135,
+          "F1 Score": 0.79,
+          "Balanced Accuracy": 0.4806
+        },
+        "14": {
+          "Accuracy": 0.7831,
+          "Precision": 0.8984,
+          "Sensitivity": 0.8402,
+          "Specificity": 0.5092,
+          "F1 Score": 0.8616,
+          "Balanced Accuracy": 0.6747
+        },
+        "14A": {
+          "Accuracy": 0.6945,
+          "Precision": 0.6816,
+          "Sensitivity": 0.974,
+          "Specificity": 0.1052,
+          "F1 Score": 0.7947,
+          "Balanced Accuracy": 0.5396
+        },
+        "15": {
+          "Accuracy": 0.9772,
+          "Precision": 0.3792,
+          "Sensitivity": 0.5306,
+          "Specificity": 0.9789,
+          "F1 Score": 0.3946,
+          "Balanced Accuracy": 0.7547
+        },
+        "15A": {
+          "Accuracy": 0.9992,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8865,
+          "Precision": 0.202,
+          "Sensitivity": 0.4582,
+          "Specificity": 0.8811,
+          "F1 Score": 0.2668,
+          "Balanced Accuracy": 0.6696
+        },
+        "16A": {
+          "Accuracy": 0.956,
+          "Precision": 0.0171,
+          "Sensitivity": 0.0712,
+          "Specificity": 0.9611,
+          "Balanced Accuracy": 0.5162,
+          "F1 Score": 0.0266
+        },
+        "17": {
+          "Accuracy": 0.6133,
+          "Precision": 0.9818,
+          "Sensitivity": 0.6163,
+          "Specificity": 0.4205,
+          "F1 Score": 0.7503,
+          "Balanced Accuracy": 0.5184
+        },
+        "17A": {
+          "Accuracy": 0.9626,
+          "Precision": 1.0,
+          "Sensitivity": 0.9626,
+          "F1 Score": 0.9809
+        },
+        "23": {
+          "Accuracy": 0.9989,
+          "Precision": 0.3651,
+          "Sensitivity": 0.6429,
+          "Specificity": 0.9992,
+          "F1 Score": 0.4176,
+          "Balanced Accuracy": 0.821
+        },
+        "54": {
+          "Accuracy": 0.982,
+          "Precision": 0.2539,
+          "Sensitivity": 0.2855,
+          "Specificity": 0.9919,
+          "F1 Score": 0.2535,
+          "Balanced Accuracy": 0.6387
+        },
+        "55": {
+          "Accuracy": 0.9724,
+          "Precision": 0.4151,
+          "Sensitivity": 0.5329,
+          "Specificity": 0.9848,
+          "F1 Score": 0.4306,
+          "Balanced Accuracy": 0.7588
+        },
+        "58": {
+          "Accuracy": 0.9967,
+          "Precision": 0.0222,
+          "Sensitivity": 0.306,
+          "Specificity": 0.9968,
+          "Balanced Accuracy": 0.6514,
+          "F1 Score": 0.1034
+        },
+        "59": {
+          "Accuracy": 0.9986,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9989,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.bilinear_0.7": {
+        "5": {
+          "Accuracy": 0.906,
+          "Precision": 0.8899,
+          "Sensitivity": 0.964,
+          "Specificity": 0.806,
+          "F1 Score": 0.9245,
+          "Balanced Accuracy": 0.885
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0026,
+          "Sensitivity": 0.05,
+          "Specificity": 1.0,
+          "F1 Score": 0.0345,
+          "Balanced Accuracy": 0.525
+        },
+        "7": {
+          "Accuracy": 0.9559,
+          "Precision": 0.3133,
+          "Sensitivity": 0.6691,
+          "Specificity": 0.9589,
+          "F1 Score": 0.4119,
+          "Balanced Accuracy": 0.814
+        },
+        "8": {
+          "Accuracy": 0.9666,
+          "Specificity": 0.9676,
+          "Precision": 0.0018,
+          "Sensitivity": 0.0665,
+          "Balanced Accuracy": 0.5162,
+          "F1 Score": 0.0091
+        },
+        "9": {
+          "Accuracy": 0.6568,
+          "Precision": 0.7175,
+          "Sensitivity": 0.8057,
+          "Specificity": 0.1721,
+          "F1 Score": 0.75,
+          "Balanced Accuracy": 0.4889
+        },
+        "10": {
+          "Accuracy": 0.5432,
+          "Precision": 0.998,
+          "Sensitivity": 0.5429,
+          "Specificity": 0.5791,
+          "F1 Score": 0.6634,
+          "Balanced Accuracy": 0.561
+        },
+        "11": {
+          "Accuracy": 0.6516,
+          "Precision": 0.9993,
+          "Sensitivity": 0.6516,
+          "Specificity": 0.5008,
+          "F1 Score": 0.7635,
+          "Balanced Accuracy": 0.5748
+        },
+        "12": {
+          "Accuracy": 0.5942,
+          "Precision": 0.7052,
+          "Sensitivity": 0.6577,
+          "Specificity": 0.3573,
+          "F1 Score": 0.6466,
+          "Balanced Accuracy": 0.5075
+        },
+        "13": {
+          "Accuracy": 0.6871,
+          "Precision": 0.9544,
+          "Sensitivity": 0.7171,
+          "Specificity": 0.2138,
+          "F1 Score": 0.7887,
+          "Balanced Accuracy": 0.4807
+        },
+        "14": {
+          "Accuracy": 0.7805,
+          "Precision": 0.894,
+          "Sensitivity": 0.8406,
+          "Specificity": 0.5024,
+          "F1 Score": 0.8596,
+          "Balanced Accuracy": 0.6715
+        },
+        "14A": {
+          "Accuracy": 0.6857,
+          "Precision": 0.6717,
+          "Sensitivity": 0.9742,
+          "Specificity": 0.1036,
+          "F1 Score": 0.7873,
+          "Balanced Accuracy": 0.5389
+        },
+        "15": {
+          "Accuracy": 0.9769,
+          "Precision": 0.3639,
+          "Sensitivity": 0.5418,
+          "Specificity": 0.9783,
+          "F1 Score": 0.3917,
+          "Balanced Accuracy": 0.7601
+        },
+        "15A": {
+          "Accuracy": 0.9994,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8851,
+          "Precision": 0.1879,
+          "Sensitivity": 0.4583,
+          "Specificity": 0.8791,
+          "F1 Score": 0.2524,
+          "Balanced Accuracy": 0.6687
+        },
+        "16A": {
+          "Accuracy": 0.957,
+          "Precision": 0.0141,
+          "Sensitivity": 0.0688,
+          "Specificity": 0.961,
+          "Balanced Accuracy": 0.5149,
+          "F1 Score": 0.0222
+        },
+        "17": {
+          "Accuracy": 0.6122,
+          "Precision": 0.9797,
+          "Sensitivity": 0.616,
+          "Specificity": 0.4009,
+          "F1 Score": 0.7494,
+          "Balanced Accuracy": 0.5084
+        },
+        "17A": {
+          "Accuracy": 0.9626,
+          "Precision": 1.0,
+          "Sensitivity": 0.9626,
+          "F1 Score": 0.9809
+        },
+        "23": {
+          "Accuracy": 0.9989,
+          "Precision": 0.3458,
+          "Sensitivity": 0.6502,
+          "Specificity": 0.9992,
+          "F1 Score": 0.4047,
+          "Balanced Accuracy": 0.8247
+        },
+        "54": {
+          "Accuracy": 0.9825,
+          "Precision": 0.2412,
+          "Sensitivity": 0.2933,
+          "Specificity": 0.9917,
+          "F1 Score": 0.2501,
+          "Balanced Accuracy": 0.6425
+        },
+        "55": {
+          "Accuracy": 0.9722,
+          "Precision": 0.3804,
+          "Sensitivity": 0.5268,
+          "Specificity": 0.9838,
+          "F1 Score": 0.4032,
+          "Balanced Accuracy": 0.7553
+        },
+        "58": {
+          "Accuracy": 0.9967,
+          "Precision": 0.0166,
+          "Sensitivity": 0.2997,
+          "Specificity": 0.9968,
+          "Balanced Accuracy": 0.6482,
+          "F1 Score": 0.0784
+        },
+        "59": {
+          "Accuracy": 0.9988,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9989,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.cubic_0.1": {
+        "5": {
+          "Accuracy": 0.9263,
+          "Precision": 0.921,
+          "Sensitivity": 0.9634,
+          "Specificity": 0.8566,
+          "F1 Score": 0.9409,
+          "Balanced Accuracy": 0.91
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0117,
+          "Sensitivity": 0.1333,
+          "Specificity": 1.0,
+          "F1 Score": 0.1455,
+          "Balanced Accuracy": 0.5667
+        },
+        "7": {
+          "Accuracy": 0.9632,
+          "Precision": 0.3627,
+          "Sensitivity": 0.63,
+          "Specificity": 0.9676,
+          "F1 Score": 0.444,
+          "Balanced Accuracy": 0.7988
+        },
+        "8": {
+          "Accuracy": 0.9659,
+          "Specificity": 0.968,
+          "Precision": 0.0037,
+          "Sensitivity": 0.0832,
+          "Balanced Accuracy": 0.5248,
+          "F1 Score": 0.0182
+        },
+        "9": {
+          "Accuracy": 0.6914,
+          "Precision": 0.7689,
+          "Sensitivity": 0.8039,
+          "Specificity": 0.1969,
+          "F1 Score": 0.7781,
+          "Balanced Accuracy": 0.5004
+        },
+        "10": {
+          "Accuracy": 0.5431,
+          "Precision": 0.9996,
+          "Sensitivity": 0.5429,
+          "Specificity": 0.6437,
+          "F1 Score": 0.6637,
+          "Balanced Accuracy": 0.5967
+        },
+        "11": {
+          "Accuracy": 0.6517,
+          "Precision": 0.9998,
+          "Sensitivity": 0.6517,
+          "Specificity": 0.4986,
+          "F1 Score": 0.7636,
+          "Balanced Accuracy": 0.5698
+        },
+        "12": {
+          "Accuracy": 0.6311,
+          "Precision": 0.7953,
+          "Sensitivity": 0.6596,
+          "Specificity": 0.4008,
+          "F1 Score": 0.6937,
+          "Balanced Accuracy": 0.5242
+        },
+        "13": {
+          "Accuracy": 0.6949,
+          "Precision": 0.9669,
+          "Sensitivity": 0.717,
+          "Specificity": 0.2121,
+          "F1 Score": 0.7946,
+          "Balanced Accuracy": 0.4798
+        },
+        "14": {
+          "Accuracy": 0.7965,
+          "Precision": 0.9183,
+          "Sensitivity": 0.8403,
+          "Specificity": 0.5533,
+          "F1 Score": 0.8715,
+          "Balanced Accuracy": 0.6968
+        },
+        "14A": {
+          "Accuracy": 0.721,
+          "Precision": 0.709,
+          "Sensitivity": 0.9737,
+          "Specificity": 0.1155,
+          "F1 Score": 0.8133,
+          "Balanced Accuracy": 0.5446
+        },
+        "15": {
+          "Accuracy": 0.9802,
+          "Precision": 0.4041,
+          "Sensitivity": 0.512,
+          "Specificity": 0.9822,
+          "F1 Score": 0.3962,
+          "Balanced Accuracy": 0.7471
+        },
+        "15A": {
+          "Accuracy": 0.9991,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8958,
+          "Precision": 0.2283,
+          "Sensitivity": 0.4559,
+          "Specificity": 0.8935,
+          "F1 Score": 0.2865,
+          "Balanced Accuracy": 0.6747
+        },
+        "16A": {
+          "Accuracy": 0.9548,
+          "Precision": 0.0297,
+          "Sensitivity": 0.0777,
+          "Specificity": 0.9618,
+          "Balanced Accuracy": 0.5197,
+          "F1 Score": 0.0362
+        },
+        "17": {
+          "Accuracy": 0.6153,
+          "Precision": 0.9885,
+          "Sensitivity": 0.6161,
+          "Specificity": 0.5106,
+          "F1 Score": 0.7519,
+          "Balanced Accuracy": 0.5633
+        },
+        "17A": {
+          "Accuracy": 0.9626,
+          "Precision": 1.0,
+          "Sensitivity": 0.9626,
+          "F1 Score": 0.9809
+        },
+        "23": {
+          "Accuracy": 0.999,
+          "Precision": 0.3964,
+          "Sensitivity": 0.6361,
+          "Specificity": 0.9993,
+          "F1 Score": 0.4343,
+          "Balanced Accuracy": 0.8177
+        },
+        "54": {
+          "Accuracy": 0.9836,
+          "Precision": 0.2687,
+          "Sensitivity": 0.2832,
+          "Specificity": 0.9931,
+          "F1 Score": 0.2613,
+          "Balanced Accuracy": 0.6381
+        },
+        "55": {
+          "Accuracy": 0.9754,
+          "Precision": 0.5423,
+          "Sensitivity": 0.5251,
+          "Specificity": 0.9898,
+          "F1 Score": 0.5018,
+          "Balanced Accuracy": 0.7574
+        },
+        "58": {
+          "Accuracy": 0.9968,
+          "Precision": 0.0313,
+          "Sensitivity": 0.2939,
+          "Specificity": 0.997,
+          "Balanced Accuracy": 0.6455,
+          "F1 Score": 0.1423
+        },
+        "59": {
+          "Accuracy": 0.9982,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9989,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.cubic_0.2": {
+        "5": {
+          "Accuracy": 0.9245,
+          "Precision": 0.9179,
+          "Sensitivity": 0.9636,
+          "Specificity": 0.8518,
+          "F1 Score": 0.9393,
+          "Balanced Accuracy": 0.9077
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0117,
+          "Sensitivity": 0.16,
+          "Specificity": 1.0,
+          "F1 Score": 0.1481,
+          "Balanced Accuracy": 0.58
+        },
+        "7": {
+          "Accuracy": 0.9629,
+          "Precision": 0.35,
+          "Sensitivity": 0.6387,
+          "Specificity": 0.9669,
+          "F1 Score": 0.4358,
+          "Balanced Accuracy": 0.8028
+        },
+        "8": {
+          "Accuracy": 0.9663,
+          "Specificity": 0.968,
+          "Precision": 0.0031,
+          "Sensitivity": 0.083,
+          "Balanced Accuracy": 0.5247,
+          "F1 Score": 0.0153
+        },
+        "9": {
+          "Accuracy": 0.6865,
+          "Precision": 0.7616,
+          "Sensitivity": 0.803,
+          "Specificity": 0.1941,
+          "F1 Score": 0.7736,
+          "Balanced Accuracy": 0.4986
+        },
+        "10": {
+          "Accuracy": 0.5431,
+          "Precision": 0.9994,
+          "Sensitivity": 0.5429,
+          "Specificity": 0.6216,
+          "F1 Score": 0.6637,
+          "Balanced Accuracy": 0.5822
+        },
+        "11": {
+          "Accuracy": 0.6517,
+          "Precision": 0.9998,
+          "Sensitivity": 0.6517,
+          "Specificity": 0.5042,
+          "F1 Score": 0.7636,
+          "Balanced Accuracy": 0.5726
+        },
+        "12": {
+          "Accuracy": 0.6239,
+          "Precision": 0.7764,
+          "Sensitivity": 0.6583,
+          "Specificity": 0.398,
+          "F1 Score": 0.684,
+          "Balanced Accuracy": 0.5221
+        },
+        "13": {
+          "Accuracy": 0.6939,
+          "Precision": 0.9654,
+          "Sensitivity": 0.717,
+          "Specificity": 0.2133,
+          "F1 Score": 0.7939,
+          "Balanced Accuracy": 0.4804
+        },
+        "14": {
+          "Accuracy": 0.7952,
+          "Precision": 0.9158,
+          "Sensitivity": 0.8406,
+          "Specificity": 0.5481,
+          "F1 Score": 0.8704,
+          "Balanced Accuracy": 0.6943
+        },
+        "14A": {
+          "Accuracy": 0.7162,
+          "Precision": 0.7036,
+          "Sensitivity": 0.9737,
+          "Specificity": 0.1144,
+          "F1 Score": 0.8094,
+          "Balanced Accuracy": 0.5441
+        },
+        "15": {
+          "Accuracy": 0.9801,
+          "Precision": 0.3945,
+          "Sensitivity": 0.5173,
+          "Specificity": 0.9819,
+          "F1 Score": 0.395,
+          "Balanced Accuracy": 0.7496
+        },
+        "15A": {
+          "Accuracy": 0.9992,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.895,
+          "Precision": 0.2182,
+          "Sensitivity": 0.4555,
+          "Specificity": 0.8922,
+          "F1 Score": 0.2776,
+          "Balanced Accuracy": 0.6739
+        },
+        "16A": {
+          "Accuracy": 0.9555,
+          "Precision": 0.0253,
+          "Sensitivity": 0.0752,
+          "Specificity": 0.9617,
+          "Balanced Accuracy": 0.5184,
+          "F1 Score": 0.032
+        },
+        "17": {
+          "Accuracy": 0.6149,
+          "Precision": 0.9877,
+          "Sensitivity": 0.6159,
+          "Specificity": 0.497,
+          "F1 Score": 0.7516,
+          "Balanced Accuracy": 0.5564
+        },
+        "17A": {
+          "Accuracy": 0.9626,
+          "Precision": 1.0,
+          "Sensitivity": 0.9626,
+          "F1 Score": 0.9809
+        },
+        "23": {
+          "Accuracy": 0.999,
+          "Precision": 0.3841,
+          "Sensitivity": 0.6411,
+          "Specificity": 0.9993,
+          "F1 Score": 0.4275,
+          "Balanced Accuracy": 0.8202
+        },
+        "54": {
+          "Accuracy": 0.9839,
+          "Precision": 0.2606,
+          "Sensitivity": 0.289,
+          "Specificity": 0.993,
+          "F1 Score": 0.26,
+          "Balanced Accuracy": 0.641
+        },
+        "55": {
+          "Accuracy": 0.9758,
+          "Precision": 0.4974,
+          "Sensitivity": 0.53,
+          "Specificity": 0.989,
+          "F1 Score": 0.4798,
+          "Balanced Accuracy": 0.7595
+        },
+        "58": {
+          "Accuracy": 0.9968,
+          "Precision": 0.0272,
+          "Sensitivity": 0.2923,
+          "Specificity": 0.997,
+          "Balanced Accuracy": 0.6446,
+          "F1 Score": 0.1248
+        },
+        "59": {
+          "Accuracy": 0.9984,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9989,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.cubic_0.3": {
+        "5": {
+          "Accuracy": 0.9228,
+          "Precision": 0.9151,
+          "Sensitivity": 0.9638,
+          "Specificity": 0.8477,
+          "F1 Score": 0.938,
+          "Balanced Accuracy": 0.9057
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0058,
+          "Sensitivity": 0.1333,
+          "Specificity": 1.0,
+          "F1 Score": 0.0769,
+          "Balanced Accuracy": 0.5667
+        },
+        "7": {
+          "Accuracy": 0.9627,
+          "Precision": 0.3402,
+          "Sensitivity": 0.648,
+          "Specificity": 0.9663,
+          "F1 Score": 0.4295,
+          "Balanced Accuracy": 0.8071
+        },
+        "8": {
+          "Accuracy": 0.9666,
+          "Specificity": 0.9679,
+          "Precision": 0.0025,
+          "Sensitivity": 0.0818,
+          "Balanced Accuracy": 0.5241,
+          "F1 Score": 0.0124
+        },
+        "9": {
+          "Accuracy": 0.6825,
+          "Precision": 0.7556,
+          "Sensitivity": 0.8023,
+          "Specificity": 0.1921,
+          "F1 Score": 0.7698,
+          "Balanced Accuracy": 0.4972
+        },
+        "10": {
+          "Accuracy": 0.5431,
+          "Precision": 0.9993,
+          "Sensitivity": 0.543,
+          "Specificity": 0.6092,
+          "F1 Score": 0.6637,
+          "Balanced Accuracy": 0.5761
+        },
+        "11": {
+          "Accuracy": 0.6517,
+          "Precision": 0.9997,
+          "Sensitivity": 0.6518,
+          "Specificity": 0.5032,
+          "F1 Score": 0.7636,
+          "Balanced Accuracy": 0.5721
+        },
+        "12": {
+          "Accuracy": 0.6181,
+          "Precision": 0.7613,
+          "Sensitivity": 0.6571,
+          "Specificity": 0.396,
+          "F1 Score": 0.676,
+          "Balanced Accuracy": 0.5205
+        },
+        "13": {
+          "Accuracy": 0.6931,
+          "Precision": 0.9642,
+          "Sensitivity": 0.7169,
+          "Specificity": 0.2156,
+          "F1 Score": 0.7933,
+          "Balanced Accuracy": 0.4815
+        },
+        "14": {
+          "Accuracy": 0.7939,
+          "Precision": 0.9136,
+          "Sensitivity": 0.8408,
+          "Specificity": 0.5437,
+          "F1 Score": 0.8695,
+          "Balanced Accuracy": 0.6923
+        },
+        "14A": {
+          "Accuracy": 0.7121,
+          "Precision": 0.6989,
+          "Sensitivity": 0.9737,
+          "Specificity": 0.1135,
+          "F1 Score": 0.806,
+          "Balanced Accuracy": 0.5436
+        },
+        "15": {
+          "Accuracy": 0.98,
+          "Precision": 0.3878,
+          "Sensitivity": 0.5244,
+          "Specificity": 0.9816,
+          "F1 Score": 0.3953,
+          "Balanced Accuracy": 0.753
+        },
+        "15A": {
+          "Accuracy": 0.9993,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8943,
+          "Precision": 0.2098,
+          "Sensitivity": 0.4539,
+          "Specificity": 0.8912,
+          "F1 Score": 0.2698,
+          "Balanced Accuracy": 0.6726
+        },
+        "16A": {
+          "Accuracy": 0.9561,
+          "Precision": 0.023,
+          "Sensitivity": 0.0731,
+          "Specificity": 0.9616,
+          "Balanced Accuracy": 0.5174,
+          "F1 Score": 0.0288
+        },
+        "17": {
+          "Accuracy": 0.6145,
+          "Precision": 0.987,
+          "Sensitivity": 0.6158,
+          "Specificity": 0.486,
+          "F1 Score": 0.7513,
+          "Balanced Accuracy": 0.5509
+        },
+        "17A": {
+          "Accuracy": 0.9626,
+          "Precision": 1.0,
+          "Sensitivity": 0.9626,
+          "F1 Score": 0.9809
+        },
+        "23": {
+          "Accuracy": 0.999,
+          "Precision": 0.3736,
+          "Sensitivity": 0.6453,
+          "Specificity": 0.9993,
+          "F1 Score": 0.4213,
+          "Balanced Accuracy": 0.8223
+        },
+        "54": {
+          "Accuracy": 0.9842,
+          "Precision": 0.254,
+          "Sensitivity": 0.2937,
+          "Specificity": 0.9929,
+          "F1 Score": 0.2587,
+          "Balanced Accuracy": 0.6433
+        },
+        "55": {
+          "Accuracy": 0.976,
+          "Precision": 0.4655,
+          "Sensitivity": 0.5314,
+          "Specificity": 0.9884,
+          "F1 Score": 0.461,
+          "Balanced Accuracy": 0.7599
+        },
+        "58": {
+          "Accuracy": 0.9968,
+          "Precision": 0.0236,
+          "Sensitivity": 0.2945,
+          "Specificity": 0.997,
+          "Balanced Accuracy": 0.6457,
+          "F1 Score": 0.1097
+        },
+        "59": {
+          "Accuracy": 0.9985,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9989,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.cubic_0.5": {
+        "5": {
+          "Accuracy": 0.9199,
+          "Precision": 0.9101,
+          "Sensitivity": 0.9641,
+          "Specificity": 0.8405,
+          "F1 Score": 0.9354,
+          "Balanced Accuracy": 0.9023
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0058,
+          "Sensitivity": 0.1333,
+          "Specificity": 1.0,
+          "F1 Score": 0.0769,
+          "Balanced Accuracy": 0.5667
+        },
+        "7": {
+          "Accuracy": 0.9619,
+          "Precision": 0.3189,
+          "Sensitivity": 0.6637,
+          "Specificity": 0.9649,
+          "F1 Score": 0.4139,
+          "Balanced Accuracy": 0.8143
+        },
+        "8": {
+          "Accuracy": 0.967,
+          "Specificity": 0.9679,
+          "Precision": 0.0017,
+          "Sensitivity": 0.0784,
+          "Balanced Accuracy": 0.5223,
+          "F1 Score": 0.0083
+        },
+        "9": {
+          "Accuracy": 0.675,
+          "Precision": 0.7443,
+          "Sensitivity": 0.8008,
+          "Specificity": 0.1883,
+          "F1 Score": 0.7626,
+          "Balanced Accuracy": 0.4946
+        },
+        "10": {
+          "Accuracy": 0.5432,
+          "Precision": 0.999,
+          "Sensitivity": 0.543,
+          "Specificity": 0.5807,
+          "F1 Score": 0.6637,
+          "Balanced Accuracy": 0.5618
+        },
+        "11": {
+          "Accuracy": 0.6518,
+          "Precision": 0.9997,
+          "Sensitivity": 0.6518,
+          "Specificity": 0.4871,
+          "F1 Score": 0.7637,
+          "Balanced Accuracy": 0.5623
+        },
+        "12": {
+          "Accuracy": 0.6064,
+          "Precision": 0.7327,
+          "Sensitivity": 0.6545,
+          "Specificity": 0.376,
+          "F1 Score": 0.66,
+          "Balanced Accuracy": 0.5152
+        },
+        "13": {
+          "Accuracy": 0.6917,
+          "Precision": 0.9619,
+          "Sensitivity": 0.7169,
+          "Specificity": 0.2155,
+          "F1 Score": 0.7922,
+          "Balanced Accuracy": 0.4814
+        },
+        "14": {
+          "Accuracy": 0.7916,
+          "Precision": 0.9096,
+          "Sensitivity": 0.8411,
+          "Specificity": 0.5357,
+          "F1 Score": 0.8676,
+          "Balanced Accuracy": 0.6884
+        },
+        "14A": {
+          "Accuracy": 0.7045,
+          "Precision": 0.6902,
+          "Sensitivity": 0.9738,
+          "Specificity": 0.1119,
+          "F1 Score": 0.7996,
+          "Balanced Accuracy": 0.5428
+        },
+        "15": {
+          "Accuracy": 0.9798,
+          "Precision": 0.3743,
+          "Sensitivity": 0.5358,
+          "Specificity": 0.9812,
+          "F1 Score": 0.394,
+          "Balanced Accuracy": 0.7585
+        },
+        "15A": {
+          "Accuracy": 0.9995,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8931,
+          "Precision": 0.1955,
+          "Sensitivity": 0.4543,
+          "Specificity": 0.8894,
+          "F1 Score": 0.2565,
+          "Balanced Accuracy": 0.6718
+        },
+        "16A": {
+          "Accuracy": 0.9569,
+          "Precision": 0.015,
+          "Sensitivity": 0.0666,
+          "Specificity": 0.9615,
+          "Balanced Accuracy": 0.514,
+          "F1 Score": 0.0221
+        },
+        "17": {
+          "Accuracy": 0.6135,
+          "Precision": 0.9851,
+          "Sensitivity": 0.6154,
+          "Specificity": 0.4585,
+          "F1 Score": 0.7505,
+          "Balanced Accuracy": 0.537
+        },
+        "17A": {
+          "Accuracy": 0.9626,
+          "Precision": 1.0,
+          "Sensitivity": 0.9626,
+          "F1 Score": 0.9809
+        },
+        "23": {
+          "Accuracy": 0.999,
+          "Precision": 0.355,
+          "Sensitivity": 0.6542,
+          "Specificity": 0.9993,
+          "F1 Score": 0.4101,
+          "Balanced Accuracy": 0.8267
+        },
+        "54": {
+          "Accuracy": 0.9847,
+          "Precision": 0.2416,
+          "Sensitivity": 0.3028,
+          "Specificity": 0.9927,
+          "F1 Score": 0.2557,
+          "Balanced Accuracy": 0.6478
+        },
+        "55": {
+          "Accuracy": 0.976,
+          "Precision": 0.4172,
+          "Sensitivity": 0.5292,
+          "Specificity": 0.9874,
+          "F1 Score": 0.4275,
+          "Balanced Accuracy": 0.7583
+        },
+        "58": {
+          "Accuracy": 0.9968,
+          "Precision": 0.0177,
+          "Sensitivity": 0.2935,
+          "Specificity": 0.9969,
+          "Balanced Accuracy": 0.6452,
+          "F1 Score": 0.0835
+        },
+        "59": {
+          "Accuracy": 0.9986,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9989,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "Resampling.cubic_0.7": {
+        "5": {
+          "Accuracy": 0.9169,
+          "Precision": 0.9051,
+          "Sensitivity": 0.9643,
+          "Specificity": 0.8334,
+          "F1 Score": 0.9329,
+          "Balanced Accuracy": 0.8988
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0058,
+          "Sensitivity": 0.1333,
+          "Specificity": 1.0,
+          "F1 Score": 0.0769,
+          "Balanced Accuracy": 0.5667
+        },
+        "7": {
+          "Accuracy": 0.9611,
+          "Precision": 0.2987,
+          "Sensitivity": 0.6816,
+          "Specificity": 0.9636,
+          "F1 Score": 0.3981,
+          "Balanced Accuracy": 0.8226
+        },
+        "8": {
+          "Accuracy": 0.9673,
+          "Specificity": 0.9679,
+          "Precision": 0.0008,
+          "Sensitivity": 0.0617,
+          "Balanced Accuracy": 0.514,
+          "F1 Score": 0.0042
+        },
+        "9": {
+          "Accuracy": 0.6673,
+          "Precision": 0.7328,
+          "Sensitivity": 0.7993,
+          "Specificity": 0.1849,
+          "F1 Score": 0.7552,
+          "Balanced Accuracy": 0.4921
+        },
+        "10": {
+          "Accuracy": 0.5432,
+          "Precision": 0.9986,
+          "Sensitivity": 0.543,
+          "Specificity": 0.5711,
+          "F1 Score": 0.6636,
+          "Balanced Accuracy": 0.5571
+        },
+        "11": {
+          "Accuracy": 0.6519,
+          "Precision": 0.9995,
+          "Sensitivity": 0.6519,
+          "Specificity": 0.4916,
+          "F1 Score": 0.7637,
+          "Balanced Accuracy": 0.5703
+        },
+        "12": {
+          "Accuracy": 0.5945,
+          "Precision": 0.7033,
+          "Sensitivity": 0.6518,
+          "Specificity": 0.3672,
+          "F1 Score": 0.6427,
+          "Balanced Accuracy": 0.5095
+        },
+        "13": {
+          "Accuracy": 0.6902,
+          "Precision": 0.9595,
+          "Sensitivity": 0.7169,
+          "Specificity": 0.2153,
+          "F1 Score": 0.791,
+          "Balanced Accuracy": 0.4813
+        },
+        "14": {
+          "Accuracy": 0.7892,
+          "Precision": 0.9054,
+          "Sensitivity": 0.8414,
+          "Specificity": 0.5281,
+          "F1 Score": 0.8657,
+          "Balanced Accuracy": 0.6848
+        },
+        "14A": {
+          "Accuracy": 0.6967,
+          "Precision": 0.6814,
+          "Sensitivity": 0.9739,
+          "Specificity": 0.1103,
+          "F1 Score": 0.793,
+          "Balanced Accuracy": 0.5421
+        },
+        "15": {
+          "Accuracy": 0.9796,
+          "Precision": 0.3598,
+          "Sensitivity": 0.5484,
+          "Specificity": 0.9808,
+          "F1 Score": 0.3921,
+          "Balanced Accuracy": 0.7646
+        },
+        "15A": {
+          "Accuracy": 0.9996,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8918,
+          "Precision": 0.181,
+          "Sensitivity": 0.4544,
+          "Specificity": 0.8876,
+          "F1 Score": 0.2418,
+          "Balanced Accuracy": 0.671
+        },
+        "16A": {
+          "Accuracy": 0.9578,
+          "Precision": 0.0121,
+          "Sensitivity": 0.064,
+          "Specificity": 0.9614,
+          "Balanced Accuracy": 0.5127,
+          "F1 Score": 0.0178
+        },
+        "17": {
+          "Accuracy": 0.6126,
+          "Precision": 0.9832,
+          "Sensitivity": 0.6151,
+          "Specificity": 0.4351,
+          "F1 Score": 0.7497,
+          "Balanced Accuracy": 0.5251
+        },
+        "17A": {
+          "Accuracy": 0.9626,
+          "Precision": 1.0,
+          "Sensitivity": 0.9626,
+          "F1 Score": 0.9809
+        },
+        "23": {
+          "Accuracy": 0.9991,
+          "Precision": 0.3361,
+          "Sensitivity": 0.6637,
+          "Specificity": 0.9993,
+          "F1 Score": 0.3978,
+          "Balanced Accuracy": 0.8315
+        },
+        "54": {
+          "Accuracy": 0.9852,
+          "Precision": 0.2296,
+          "Sensitivity": 0.3128,
+          "Specificity": 0.9926,
+          "F1 Score": 0.2524,
+          "Balanced Accuracy": 0.6527
+        },
+        "55": {
+          "Accuracy": 0.9758,
+          "Precision": 0.3774,
+          "Sensitivity": 0.5204,
+          "Specificity": 0.9864,
+          "F1 Score": 0.3951,
+          "Balanced Accuracy": 0.7534
+        },
+        "58": {
+          "Accuracy": 0.9968,
+          "Precision": 0.0122,
+          "Sensitivity": 0.2821,
+          "Specificity": 0.9969,
+          "Balanced Accuracy": 0.6395,
+          "F1 Score": 0.0584
+        },
+        "59": {
+          "Accuracy": 0.9987,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9989,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "gmasi_to_icelynx_Resampling.mode": {
+        "5": {
+          "Accuracy": 0.9087,
+          "Precision": 0.897,
+          "Sensitivity": 0.9609,
+          "Specificity": 0.8159,
+          "F1 Score": 0.9269,
+          "Balanced Accuracy": 0.8884
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0065,
+          "Sensitivity": 0.075,
+          "Specificity": 1.0,
+          "F1 Score": 0.0811,
+          "Balanced Accuracy": 0.5375
+        },
+        "7": {
+          "Accuracy": 0.9551,
+          "Precision": 0.3336,
+          "Sensitivity": 0.6257,
+          "Specificity": 0.9597,
+          "F1 Score": 0.421,
+          "Balanced Accuracy": 0.7927
+        },
+        "8": {
+          "Accuracy": 0.9653,
+          "Specificity": 0.9668,
+          "Precision": 0.0024,
+          "Sensitivity": 0.0642,
+          "Balanced Accuracy": 0.5147,
+          "F1 Score": 0.0126
+        },
+        "9": {
+          "Accuracy": 0.6621,
+          "Precision": 0.73,
+          "Sensitivity": 0.8014,
+          "Specificity": 0.1761,
+          "F1 Score": 0.7557,
+          "Balanced Accuracy": 0.4888
+        },
+        "10": {
+          "Accuracy": 0.5415,
+          "Precision": 0.9984,
+          "Sensitivity": 0.5411,
+          "Specificity": 0.6093,
+          "F1 Score": 0.6622,
+          "Balanced Accuracy": 0.5752
+        },
+        "11": {
+          "Accuracy": 0.6506,
+          "Precision": 0.9994,
+          "Sensitivity": 0.6507,
+          "Specificity": 0.4841,
+          "F1 Score": 0.7628,
+          "Balanced Accuracy": 0.5659
+        },
+        "12": {
+          "Accuracy": 0.6035,
+          "Precision": 0.7307,
+          "Sensitivity": 0.6581,
+          "Specificity": 0.3772,
+          "F1 Score": 0.6609,
+          "Balanced Accuracy": 0.5177
+        },
+        "13": {
+          "Accuracy": 0.688,
+          "Precision": 0.9569,
+          "Sensitivity": 0.7164,
+          "Specificity": 0.2145,
+          "F1 Score": 0.7895,
+          "Balanced Accuracy": 0.4807
+        },
+        "14": {
+          "Accuracy": 0.779,
+          "Precision": 0.8977,
+          "Sensitivity": 0.8358,
+          "Specificity": 0.5071,
+          "F1 Score": 0.8589,
+          "Balanced Accuracy": 0.6715
+        },
+        "14A": {
+          "Accuracy": 0.6933,
+          "Precision": 0.681,
+          "Sensitivity": 0.9723,
+          "Specificity": 0.1081,
+          "F1 Score": 0.794,
+          "Balanced Accuracy": 0.5402
+        },
+        "15": {
+          "Accuracy": 0.9765,
+          "Precision": 0.384,
+          "Sensitivity": 0.5211,
+          "Specificity": 0.9785,
+          "F1 Score": 0.3949,
+          "Balanced Accuracy": 0.7498
+        },
+        "15A": {
+          "Accuracy": 0.9992,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8857,
+          "Precision": 0.203,
+          "Sensitivity": 0.4561,
+          "Specificity": 0.8804,
+          "F1 Score": 0.268,
+          "Balanced Accuracy": 0.6682
+        },
+        "16A": {
+          "Accuracy": 0.9542,
+          "Precision": 0.0193,
+          "Sensitivity": 0.0751,
+          "Specificity": 0.96,
+          "Balanced Accuracy": 0.5175,
+          "F1 Score": 0.0307
+        },
+        "17": {
+          "Accuracy": 0.6133,
+          "Precision": 0.9817,
+          "Sensitivity": 0.6164,
+          "Specificity": 0.421,
+          "F1 Score": 0.7503,
+          "Balanced Accuracy": 0.5187
+        },
+        "17A": {
+          "Accuracy": 0.9571,
+          "Precision": 1.0,
+          "Sensitivity": 0.9571,
+          "F1 Score": 0.978
+        },
+        "23": {
+          "Accuracy": 0.9988,
+          "Precision": 0.3752,
+          "Sensitivity": 0.6314,
+          "Specificity": 0.9992,
+          "F1 Score": 0.426,
+          "Balanced Accuracy": 0.8153
+        },
+        "54": {
+          "Accuracy": 0.9815,
+          "Precision": 0.258,
+          "Sensitivity": 0.2842,
+          "Specificity": 0.9917,
+          "F1 Score": 0.2544,
+          "Balanced Accuracy": 0.638
+        },
+        "55": {
+          "Accuracy": 0.9716,
+          "Precision": 0.4336,
+          "Sensitivity": 0.5285,
+          "Specificity": 0.9847,
+          "F1 Score": 0.4438,
+          "Balanced Accuracy": 0.7566
+        },
+        "58": {
+          "Accuracy": 0.9965,
+          "Precision": 0.0234,
+          "Sensitivity": 0.292,
+          "Specificity": 0.9967,
+          "Balanced Accuracy": 0.6443,
+          "F1 Score": 0.0868
+        },
+        "59": {
+          "Accuracy": 0.9984,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9988,
+          "Balanced Accuracy": 0.4994
+        }
+      },
+      "gmasi_to_icelynx_Resampling.nearest": {
+        "5": {
+          "Accuracy": 0.9092,
+          "Precision": 0.8952,
+          "Sensitivity": 0.9637,
+          "Specificity": 0.8133,
+          "F1 Score": 0.9273,
+          "Balanced Accuracy": 0.8885
+        },
+        "6": {
+          "Accuracy": 1.0,
+          "Precision": 0.0053,
+          "Sensitivity": 0.08,
+          "Specificity": 1.0,
+          "F1 Score": 0.0678,
+          "Balanced Accuracy": 0.54
+        },
+        "7": {
+          "Accuracy": 0.9566,
+          "Precision": 0.3333,
+          "Sensitivity": 0.6523,
+          "Specificity": 0.9603,
+          "F1 Score": 0.4265,
+          "Balanced Accuracy": 0.8063
+        },
+        "8": {
+          "Accuracy": 0.9661,
+          "Specificity": 0.9676,
+          "Precision": 0.0029,
+          "Sensitivity": 0.0769,
+          "Balanced Accuracy": 0.5215,
+          "F1 Score": 0.0144
+        },
+        "9": {
+          "Accuracy": 0.6648,
+          "Precision": 0.7293,
+          "Sensitivity": 0.8071,
+          "Specificity": 0.175,
+          "F1 Score": 0.7577,
+          "Balanced Accuracy": 0.4911
+        },
+        "10": {
+          "Accuracy": 0.5432,
+          "Precision": 0.9983,
+          "Sensitivity": 0.5429,
+          "Specificity": 0.5908,
+          "F1 Score": 0.6635,
+          "Balanced Accuracy": 0.5669
+        },
+        "11": {
+          "Accuracy": 0.6515,
+          "Precision": 0.9994,
+          "Sensitivity": 0.6515,
+          "Specificity": 0.4827,
+          "F1 Score": 0.7634,
+          "Balanced Accuracy": 0.5657
+        },
+        "12": {
+          "Accuracy": 0.6044,
+          "Precision": 0.7298,
+          "Sensitivity": 0.6598,
+          "Specificity": 0.3776,
+          "F1 Score": 0.6612,
+          "Balanced Accuracy": 0.5187
+        },
+        "13": {
+          "Accuracy": 0.6886,
+          "Precision": 0.9569,
+          "Sensitivity": 0.7171,
+          "Specificity": 0.2135,
+          "F1 Score": 0.7899,
+          "Balanced Accuracy": 0.4806
+        },
+        "14": {
+          "Accuracy": 0.7829,
+          "Precision": 0.8983,
+          "Sensitivity": 0.8402,
+          "Specificity": 0.5088,
+          "F1 Score": 0.8615,
+          "Balanced Accuracy": 0.6745
+        },
+        "14A": {
+          "Accuracy": 0.6942,
+          "Precision": 0.6814,
+          "Sensitivity": 0.974,
+          "Specificity": 0.1052,
+          "F1 Score": 0.7945,
+          "Balanced Accuracy": 0.5396
+        },
+        "15": {
+          "Accuracy": 0.9772,
+          "Precision": 0.379,
+          "Sensitivity": 0.528,
+          "Specificity": 0.9789,
+          "F1 Score": 0.393,
+          "Balanced Accuracy": 0.7534
+        },
+        "15A": {
+          "Accuracy": 0.9992,
+          "Sensitivity": 0.0,
+          "Specificity": 1.0,
+          "Balanced Accuracy": 0.5,
+          "Precision": 0.0
+        },
+        "16": {
+          "Accuracy": 0.8866,
+          "Precision": 0.2031,
+          "Sensitivity": 0.4577,
+          "Specificity": 0.8811,
+          "F1 Score": 0.2679,
+          "Balanced Accuracy": 0.6694
+        },
+        "16A": {
+          "Accuracy": 0.9559,
+          "Precision": 0.0175,
+          "Sensitivity": 0.073,
+          "Specificity": 0.9611,
+          "Balanced Accuracy": 0.517,
+          "F1 Score": 0.0274
+        },
+        "17": {
+          "Accuracy": 0.6132,
+          "Precision": 0.9817,
+          "Sensitivity": 0.6163,
+          "Specificity": 0.4192,
+          "F1 Score": 0.7502,
+          "Balanced Accuracy": 0.5178
+        },
+        "17A": {
+          "Accuracy": 0.9626,
+          "Precision": 1.0,
+          "Sensitivity": 0.9626,
+          "F1 Score": 0.9809
+        },
+        "23": {
+          "Accuracy": 0.9989,
+          "Precision": 0.3655,
+          "Sensitivity": 0.6418,
+          "Specificity": 0.9992,
+          "F1 Score": 0.4176,
+          "Balanced Accuracy": 0.8205
+        },
+        "54": {
+          "Accuracy": 0.9819,
+          "Precision": 0.2545,
+          "Sensitivity": 0.2839,
+          "Specificity": 0.9919,
+          "F1 Score": 0.2531,
+          "Balanced Accuracy": 0.6379
+        },
+        "55": {
+          "Accuracy": 0.9721,
+          "Precision": 0.4299,
+          "Sensitivity": 0.5321,
+          "Specificity": 0.985,
+          "F1 Score": 0.4418,
+          "Balanced Accuracy": 0.7585
+        },
+        "58": {
+          "Accuracy": 0.9967,
+          "Precision": 0.0228,
+          "Sensitivity": 0.3025,
+          "Specificity": 0.9968,
+          "Balanced Accuracy": 0.6497,
+          "F1 Score": 0.1062
+        },
+        "59": {
+          "Accuracy": 0.9986,
+          "Precision": 0.0,
+          "Sensitivity": 0.0,
+          "Specificity": 0.9989,
+          "Balanced Accuracy": 0.4994
+        }
+      }
+    }
+  },
+  "dateRange": {
+    "start": "2025-11-08",
+    "end": "2025-12-15",
+    "n": 38
+  }
+};
+
+const METRIC_KEYS = [
+  'F1 Score', 'Precision', 'Sensitivity',
+  'Specificity', 'Accuracy', 'Balanced Accuracy'
+];
+
+// ── Color scale ──────────────────────────────────────────────────────────────
+function metricColor(v) {
+  if (v == null) return '#ccc';
+  const t = Math.max(0, Math.min(1, v));
+  let r, g;
+  if (t < 0.5) { r = 210; g = Math.round(t * 2 * 175); }
+  else          { r = Math.round((1-(t-0.5)*2) * 210); g = 168; }
+  return `rgb(${r},${g},50)`;
+}
+
+function metricCell(v) {
+  if (v == null || v === '') return '<td class="metric-cell"><span class="na">n/a</span></td>';
+  const pct = Math.round(v * 100);
+  const col = metricColor(v);
+  return `<td class="metric-cell">
+    <div class="mbar" style="width:${pct}%;background:${col};"></div>
+    <span class="mval">${(+v).toFixed(4)}</span>
+  </td>`;
+}
+
+// ── Direction dropdown ────────────────────────────────────────────────────────
+const dirSel    = document.getElementById('dir-select');
+const methodSel = document.getElementById('method-select');
+
+const DIR_ORDER = ['upsample', 'downsample', 'regrid'];
+const available = DATA.directions;
+DIR_ORDER.filter(d => available.includes(d)).forEach(d => {
+  const opt = document.createElement('option');
+  opt.value = d;
+  opt.textContent = DATA.directionLabels[d] || d;
+  dirSel.appendChild(opt);
+});
+
+function populateMethods(direction) {
+  methodSel.innerHTML = '';
+  const groups = DATA.directionResamplerGroups[direction] || {};
+  const ORDER  = ['Average', 'Bilinear', 'Cubic', 'Other'];
+  let firstVal = null;
+  ORDER.forEach(grp => {
+    const rs = groups[grp];
+    if (!rs || !rs.length) return;
+    const og = document.createElement('optgroup');
+    og.label = grp;
+    rs.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r;
+      opt.textContent = DATA.resamplerLabels[r] || r;
+      og.appendChild(opt);
+      if (!firstVal) firstVal = r;
+    });
+    methodSel.appendChild(og);
+  });
+  return firstVal;
+}
+
+// ── Render table ─────────────────────────────────────────────────────────────
+let activeRow = null;
+
+function renderTable() {
+  const dir    = dirSel.value;
+  const method = methodSel.value;
+  const tbody  = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  const mdata = (DATA.metrics[dir] || {})[method] || {};
+
+  DATA.sectors.forEach(sid => {
+    const sname = DATA.sectorNames[sid] || sid;
+    const sm    = mdata[sid] || {};
+    const tr    = document.createElement('tr');
+    tr.dataset.sector = sid;
+
+    let cells = `<td class="sid">${sid}</td><td class="sname">${sname}</td>`;
+    METRIC_KEYS.forEach(mk => {
+      const v = sm[mk] !== undefined ? sm[mk] : null;
+      cells += metricCell(v);
+    });
+    tr.innerHTML = cells;
+
+    tr.addEventListener('click', () => {
+      if (activeRow) activeRow.classList.remove('active');
+      tr.classList.add('active');
+      activeRow = tr;
+      updateMap(sid, sname);
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+// ── Map swap ─────────────────────────────────────────────────────────────────
+function updateMap(sid, sname) {
+  const img  = document.getElementById('map-img');
+  const ph   = document.getElementById('map-placeholder');
+  const lbl  = document.getElementById('map-sector-label');
+  lbl.textContent = sid + ' — ' + sname;
+  img.style.opacity = '0';
+  img.onload  = () => { img.style.opacity = '1'; };
+  img.onerror = () => {
+    img.style.display = 'none';
+    ph.style.display = 'block';
+    ph.innerHTML = '<span class="ico">&#128247;</span>Image not yet generated<br><code>sector_' + sid + '.png</code>';
+  };
+  img.src = `sector_images/sector_${sid}.png`;
+  img.style.display = 'block';
+  ph.style.display  = 'none';
+}
+
+// ── Wire events ───────────────────────────────────────────────────────────────
+dirSel.addEventListener('change', () => {
+  populateMethods(dirSel.value);
+  clearMapSelection();
+  renderTable();
+});
+methodSel.addEventListener('change', () => {
+  clearMapSelection();
+  renderTable();
+});
+
+function clearMapSelection() {
+  if (activeRow) { activeRow.classList.remove('active'); activeRow = null; }
+  document.getElementById('map-sector-label').textContent = 'Select a row';
+  document.getElementById('map-img').style.display = 'none';
+  document.getElementById('map-placeholder').style.display = 'block';
+  document.getElementById('map-placeholder').innerHTML =
+    '<span class="ico">&#127758;</span>Click a row to view<br>the sector on the polar map.';
+}
+
+// ── Date subtitle ─────────────────────────────────────────────────────────────
+const dr = DATA.dateRange;
+document.getElementById('date-subtitle').innerHTML =
+  `<strong>${dr.n} days processed</strong> &nbsp;&middot;&nbsp; ${dr.start} &ndash; ${dr.end}`;
+
+// ── Initial render ────────────────────────────────────────────────────────────
+const firstMethod = populateMethods(dirSel.value);
+renderTable();
+</script>
+</body>
+</html>

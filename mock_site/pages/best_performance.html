@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Best Performance by Sea Sector</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: #2d3748; background: #f7f9fc; }
+
+    #page-header {
+      padding: 18px 24px 14px;
+      background: #fff;
+      border-bottom: 1px solid #dde2ea;
+    }
+    #page-header h2 { font-size: 17px; font-weight: 600; color: #1a2d44; }
+    #page-header p  { font-size: 12.5px; color: #6b7a8d; margin-top: 4px; }
+
+    #controls {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 24px;
+      background: #fff;
+      border-bottom: 1px solid #dde2ea;
+    }
+    #controls label { font-size: 12px; color: #6b7a8d; font-weight: 500; }
+    #controls select {
+      font-size: 12.5px; padding: 5px 10px;
+      border: 1px solid #c8d0dc; border-radius: 5px;
+      background: #fff; color: #2d3748; cursor: pointer;
+    }
+    #controls .sort-hint { margin-left: auto; font-size: 11px; color: #a0aab8; }
+
+    #main-layout {
+      display: flex; gap: 0; height: calc(100vh - 120px); overflow: hidden;
+    }
+
+    /* LEFT: table panel */
+    #table-panel {
+      width: 54%; flex-shrink: 0;
+      overflow-y: auto;
+      padding: 16px 12px 16px 24px;
+    }
+
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); table-layout: fixed; }
+    thead th {
+      padding: 9px 10px; text-align: left;
+      background: #f0f4f8; color: #4a5568;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+      border-bottom: 1px solid #dde2ea;
+      cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    thead th:hover { background: #e4ecf6; }
+    thead th.sort-asc::after  { content: " ▲"; font-size: 9px; }
+    thead th.sort-desc::after { content: " ▼"; font-size: 9px; }
+    tbody tr {
+      border-bottom: 1px solid #edf0f5;
+      cursor: pointer; transition: background 0.1s;
+    }
+    tbody tr:hover   { background: #f0f6ff; }
+    tbody tr.selected { background: #dbeafe; }
+    tbody td { padding: 8px 10px; vertical-align: middle; }
+
+    .sector-num  { font-weight: 600; color: #1a5fa8; white-space: nowrap; }
+    .sector-name { color: #4a5568; font-size: 12px; max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .threshold-badge {
+      display: inline-block; padding: 2px 7px;
+      background: #e9f0f8; color: #2c5282;
+      border-radius: 10px; font-size: 11px; font-weight: 600;
+    }
+
+    .score-cell { position: relative; }
+    .score-bar {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      border-radius: 0; opacity: 0.18; pointer-events: none;
+    }
+    .score-val { position: relative; font-weight: 600; font-size: 12.5px; }
+
+    .sparkline { width: 56px; height: 24px; vertical-align: middle; }
+
+    /* RIGHT: detail panel */
+    #detail-panel {
+      flex: 1; overflow-y: auto;
+      padding: 16px 24px 16px 12px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+
+    .detail-card {
+      background: #fff; border-radius: 8px;
+      border: 1px solid #dde2ea;
+      padding: 16px 18px;
+    }
+    .detail-card h3 { font-size: 13px; font-weight: 600; color: #1a2d44; margin-bottom: 12px; }
+
+    .metric-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    }
+    .metric-tile {
+      background: #f7f9fc; border-radius: 6px;
+      padding: 10px 12px; text-align: center;
+    }
+    .metric-tile .m-label { font-size: 10px; color: #8a96a8; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+    .metric-tile .m-value { font-size: 20px; font-weight: 600; margin-top: 2px; }
+    .metric-tile.f1   .m-value { color: #1a5fa8; }
+    .metric-tile.prec .m-value { color: #c0392b; }
+    .metric-tile.acc  .m-value { color: #0f6e56; }
+    .metric-tile.rec  .m-value { color: #7c3aed; }
+    .metric-tile.spec .m-value { color: #b45309; }
+    .metric-tile.thr  .m-value { color: #374151; }
+
+    #contingency-placeholder {
+      background: #f0f4f8; border-radius: 8px;
+      border: 1px dashed #b0bec8;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 220px; color: #8a96a8; gap: 8px;
+    }
+    #contingency-placeholder .ph-icon { font-size: 28px; line-height:1; }
+    #contingency-placeholder p { font-size: 12px; text-align: center; max-width: 180px; }
+
+    #contingency-img { width: 100%; border-radius: 6px; display: none; }
+
+    .date-tag { font-size: 11px; color: #6b7a8d; }
+
+    /* empty state */
+    #empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; gap: 10px; color: #a0aab8; text-align: center; padding: 40px;
+    }
+    #empty-state .es-icon { font-size: 36px; }
+    #empty-state p { font-size: 13px; max-width: 220px; }
+  </style>
+</head>
+<body>
+
+<div id="page-header">
+  <h2>Best performance by sea sector</h2>
+  <p>Peak F1 score and corresponding metrics across all dates and thresholds. Click a row to view sector detail and contingency map.</p>
+</div>
+
+<div id="controls">
+  <label for="method-select">Sampling method</label>
+  <select id="method-select" onchange="renderTable()">
+    <option value="upsample_rio">Upsample — Rio resample</option>
+    <option value="upsample_kd">Upsample — KD-tree resample</option>
+    <option value="upsample_bucket">Upsample — Bucket resample</option>
+    <option value="downsample_rio">Downsample — Rio resample</option>
+    <option value="downsample_kd">Downsample — KD-tree resample</option>
+    <option value="downsample_bucket">Downsample — Bucket resample</option>
+    <option value="regrid_gmasi">Regrid — GMASI (1km) → IceLynx</option>
+  </select>
+  <span class="sort-hint">Click column headers to sort</span>
+</div>
+
+<div id="main-layout">
+
+  <div id="table-panel">
+    <table id="perf-table">
+      <colgroup>
+        <col style="width:52px">
+        <col style="width:140px">
+        <col style="width:62px">
+        <col style="width:72px">
+        <col style="width:72px">
+        <col style="width:62px">
+        <col style="width:82px">
+        <col style="width:78px">
+        <col style="width:62px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th onclick="sortBy('sector')">Sector</th>
+          <th onclick="sortBy('name')">Name</th>
+          <th onclick="sortBy('f1')" class="sort-desc">F1 ▼</th>
+          <th onclick="sortBy('precision')">Precision</th>
+          <th onclick="sortBy('accuracy')">Accuracy</th>
+          <th onclick="sortBy('recall')">Recall</th>
+          <th onclick="sortBy('specificity')">Specificity</th>
+          <th onclick="sortBy('threshold')">Threshold</th>
+          <th>Trend</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div id="detail-panel">
+    <div id="empty-state">
+      <div class="es-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c8d0dc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </div>
+      <p>Select a row in the table to see sector metrics and contingency map</p>
+    </div>
+    <div id="detail-content" style="display:none; flex-direction:column; gap:14px;">
+      <div class="detail-card">
+        <h3 id="detail-title">Sector details</h3>
+        <div class="metric-grid">
+          <div class="metric-tile f1">
+            <div class="m-label">F1</div>
+            <div class="m-value" id="d-f1">—</div>
+          </div>
+          <div class="metric-tile prec">
+            <div class="m-label">Precision</div>
+            <div class="m-value" id="d-prec">—</div>
+          </div>
+          <div class="metric-tile acc">
+            <div class="m-label">Accuracy</div>
+            <div class="m-value" id="d-acc">—</div>
+          </div>
+          <div class="metric-tile rec">
+            <div class="m-label">Recall</div>
+            <div class="m-value" id="d-rec">—</div>
+          </div>
+          <div class="metric-tile spec">
+            <div class="m-label">Specificity</div>
+            <div class="m-value" id="d-spec">—</div>
+          </div>
+          <div class="metric-tile thr">
+            <div class="m-label">Best threshold</div>
+            <div class="m-value" id="d-thr">—</div>
+          </div>
+        </div>
+        <div style="margin-top:10px; font-size:11.5px; color:#6b7a8d;">
+          Best date: <span id="d-date" style="font-weight:600; color:#2d3748;">—</span>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <h3>Contingency map - <span id="cmap-label">select a sector</span></h3>
+        <div id="contingency-placeholder">
+          <div class="ph-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b0bec8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <p>Contingency map will appear here once sector images are wired up</p>
+        </div>
+        <img id="contingency-img" src="" alt="Contingency map">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Mock data ─────────────────────────────────────────────────────────────────
+// Replace with real per-method data objects loaded from JSON or inline.
+// Sector IDs and names sourced from your existing Plotly chart titles.
+const SECTORS = [
+  { sector: 1,  name: "Beaufort Sea" },
+  { sector: 2,  name: "Chukchi Sea" },
+  { sector: 3,  name: "East Siberian Sea" },
+  { sector: 4,  name: "Laptev Sea" },
+  { sector: 5,  name: "Kara Sea" },
+  { sector: 6,  name: "Barents Sea" },
+  { sector: 7,  name: "Greenland Sea" },
+  { sector: 8,  name: "Baffin Bay / Davis Strait" },
+  { sector: 9,  name: "Hudson Bay" },
+  { sector: 10, name: "Gulf of St. Lawrence" },
+  { sector: 11, name: "Labrador Sea" },
+  { sector: 59, name: "Coastal Waters of Southeast Alaska and British Columbia" },
+];
+
+function mockMetrics(seed) {
+  const rng = (lo, hi) => { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return lo + (Math.abs(seed) % 1000) / 1000 * (hi - lo); };
+  const f1        = +rng(0.45, 0.92).toFixed(3);
+  const precision = +rng(0.40, 0.95).toFixed(3);
+  const accuracy  = +rng(0.72, 0.98).toFixed(3);
+  const recall    = +rng(0.35, 0.90).toFixed(3);
+  const specificity = +rng(0.70, 0.98).toFixed(3);
+  const threshold = +(Math.round(rng(0.25, 0.75) * 20) / 20).toFixed(2);
+  const dates = ["2025-12-01","2025-12-05","2025-12-08","2025-12-12","2025-12-15","2025-12-18","2025-12-22"];
+  const date  = dates[Math.abs(seed) % dates.length];
+  // sparkline: 8 weekly F1 values
+  const trend = Array.from({length: 8}, () => +rng(0.30, 0.95).toFixed(3));
+  return { f1, precision, accuracy, recall, specificity, threshold, date, trend };
+}
+
+function buildData() {
+  return SECTORS.map((s, i) => ({ ...s, ...mockMetrics(s.sector * 997 + i * 137) }));
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let data = buildData();
+let sortKey = 'f1';
+let sortDir = -1; // -1 = desc, 1 = asc
+let selectedSector = null;
+
+// ── Colour helpers ─────────────────────────────────────────────────────────────
+function scoreColor(v) {
+  // green → amber → red
+  if (v >= 0.80) return '#1d9e75';
+  if (v >= 0.65) return '#d97706';
+  return '#dc2626';
+}
+
+// ── Sparkline ─────────────────────────────────────────────────────────────────
+function sparklineSVG(values, color) {
+  const W = 56, H = 24, pad = 2;
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max - min || 0.01;
+  const pts = values.map((v, i) => {
+    const x = pad + (i / (values.length - 1)) * (W - 2 * pad);
+    const y = H - pad - ((v - min) / range) * (H - 2 * pad);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `<svg class="sparkline" viewBox="0 0 ${W} ${H}"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+}
+
+// ── Score bar cell ─────────────────────────────────────────────────────────────
+function scoreCell(v) {
+  const color = scoreColor(v);
+  return `<td class="score-cell">
+    <div class="score-bar" style="width:${(v*100).toFixed(0)}%; background:${color};"></div>
+    <span class="score-val" style="color:${color};">${v.toFixed(3)}</span>
+  </td>`;
+}
+
+// ── Render table ───────────────────────────────────────────────────────────────
+function renderTable() {
+  data = buildData(); // in real version: load per-method data
+  sortAndRender();
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = key === 'f1' || key === 'precision' || key === 'accuracy' ? -1 : 1; }
+  sortAndRender();
+}
+
+function sortAndRender() {
+  const sorted = [...data].sort((a, b) => {
+    const av = a[sortKey], bv = b[sortKey];
+    return typeof av === 'number' ? (av - bv) * sortDir : String(av).localeCompare(String(bv)) * sortDir;
+  });
+
+  // update header arrows
+  document.querySelectorAll('thead th').forEach(th => { th.classList.remove('sort-asc','sort-desc'); });
+  const ths = document.querySelectorAll('thead th');
+  const keyIndex = ['sector','name','f1','precision','accuracy','recall','specificity','threshold','trend'].indexOf(sortKey);
+  if (keyIndex >= 0) ths[keyIndex].classList.add(sortDir === -1 ? 'sort-desc' : 'sort-asc');
+
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = sorted.map(row => `
+    <tr onclick="selectRow(${row.sector})" class="${selectedSector === row.sector ? 'selected' : ''}">
+      <td><span class="sector-num">${row.sector}</span></td>
+      <td><span class="sector-name" title="${row.name}">${row.name}</span></td>
+      ${scoreCell(row.f1)}
+      ${scoreCell(row.precision)}
+      ${scoreCell(row.accuracy)}
+      ${scoreCell(row.recall)}
+      ${scoreCell(row.specificity)}
+      <td><span class="threshold-badge">${row.threshold}</span></td>
+      <td>${sparklineSVG(row.trend, scoreColor(row.f1))}</td>
+    </tr>
+  `).join('');
+}
+
+// ── Select row ─────────────────────────────────────────────────────────────────
+function selectRow(sectorId) {
+  selectedSector = sectorId;
+  sortAndRender();
+
+  const row = data.find(d => d.sector === sectorId);
+  if (!row) return;
+
+  document.getElementById('empty-state').style.display   = 'none';
+  document.getElementById('detail-content').style.display = 'flex';
+
+  document.getElementById('detail-title').textContent =
+    `Sector ${row.sector} - ${row.name}`;
+  document.getElementById('d-f1').textContent   = row.f1.toFixed(3);
+  document.getElementById('d-prec').textContent = row.precision.toFixed(3);
+  document.getElementById('d-acc').textContent  = row.accuracy.toFixed(3);
+  document.getElementById('d-rec').textContent  = row.recall.toFixed(3);
+  document.getElementById('d-spec').textContent = row.specificity.toFixed(3);
+  document.getElementById('d-thr').textContent  = row.threshold;
+  document.getElementById('d-date').textContent = row.date;
+
+  document.getElementById('cmap-label').textContent = `Sector ${row.sector}`;
+
+  // Wire real image path here: e.g. `pages/contingency/sector_${row.sector}.png`
+  const imgPath = `contingency/sector_${sectorId}.png`;
+  const img = document.getElementById('contingency-img');
+  const ph  = document.getElementById('contingency-placeholder');
+
+  img.onload  = () => { ph.style.display = 'none';  img.style.display = 'block'; };
+  img.onerror = () => { ph.style.display = 'flex';  img.style.display = 'none'; };
+  img.src = imgPath;
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+renderTable();
+</script>
+</body>
+</html>
