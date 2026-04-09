@@ -1,0 +1,8 @@
+# Python cache
+__pycache__
+
+# Ignore folders
+mock_site
+
+# Log files
+**/*.log
